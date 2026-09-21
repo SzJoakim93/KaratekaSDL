@@ -18,7 +18,7 @@
 /*bb2d	"%d %d"*/
 /*bb33	0*/
 
-/*0FBB*/LoadBCGAt(fname, bp14)
+/*0FBB*/load_background_graphics(fname, bp14)
 char *fname;
 int bp14;
 {
@@ -26,7 +26,7 @@ int bp14;
 	int bp08;
 	int _p0a[2];
 
-	h = safe_open(fname, O_RDONLY|O_RAW);
+	h = open_file_safe(fname, O_RDONLY|O_RAW);
 	read(h, D_A606 + bp14, 2);
 	bp08 = D_A606[bp14] + (D_A606[bp14 + 1] << 8);
 	read(h, D_A606 + bp14, bp08);
@@ -37,7 +37,7 @@ int bp14;
 
 
 /*draw "castle.bcg"*/
-C_1024()
+load_castle_bg()
 {
 	int h;
 	int bp06;
@@ -45,7 +45,7 @@ C_1024()
 
 	BB_clear();
 
-	h = safe_open(/*bb08*/"castle.bcg", O_RDONLY|O_RAW);
+	h = open_file_safe(/*bb08*/"castle.bcg", O_RDONLY|O_RAW);
 	read(h, D_0337, 2);
 	bp06 = D_0337[0] + (D_0337[1] << 8);
 	read(h, D_0337, bp06);
@@ -56,7 +56,7 @@ C_1024()
 }
 
 /*load ks/km files*/
-C_1090(idx)
+load_sprite_assets(idx)
 int idx;
 {
 	int h;
@@ -71,7 +71,7 @@ int idx;
 	/*-- ".ind" --*/
 	strcpy(fname, D_0264[idx]);
 	strcat(fname, D_032D);
-	h = safe_open(fname, O_RDONLY|O_RAW);
+	h = open_file_safe(fname, O_RDONLY|O_RAW);
 	read(h, ks_data + ks_base, 0x2a8);
 	close(h);
 	for(i = 0; i < 0x2a8; i += 4) {
@@ -87,7 +87,7 @@ int idx;
 	/*-- ".dat" --*/
 	strcpy(fname, D_0264[idx]);
 	strcat(fname, D_0332);
-	h = safe_open(fname, O_RDONLY|O_RAW);
+	h = open_file_safe(fname, O_RDONLY|O_RAW);
 	data_sz = sz;
 	read(h, ks_data + ks_base, data_sz);
 	close(h);
@@ -97,7 +97,7 @@ int idx;
 	/*-- ".ind" --*/
 	strcpy(fname, D_02C0[idx]);
 	strcat(fname, D_032D);
-	h = safe_open(fname, O_RDONLY|O_RAW);
+	h = open_file_safe(fname, O_RDONLY|O_RAW);
 	read(h, km_data + km_base, 0x2a8);
 	close(h);
 	for(i = 0; i < 0x2a8; i += 4) {
@@ -113,7 +113,7 @@ int idx;
 	/*-- ".dat" --*/
 	strcpy(fname, D_02C0[idx]);
 	strcat(fname, D_0332);
-	h = safe_open(fname, O_RDONLY|O_RAW);
+	h = open_file_safe(fname, O_RDONLY|O_RAW);
 	read(h, km_data + km_base, sz);
 	close(h);
 	/*-- --*/
@@ -122,7 +122,7 @@ int idx;
 	/*-- --*/
 }
 
-/*12E0*/LoadScript(bp6a, bp6c)
+/*12E0*/load_animation_script(bp6a, bp6c)
 char *bp6a;
 char *bp6c;
 {

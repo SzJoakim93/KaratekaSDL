@@ -119,7 +119,7 @@ C_3233()
 		if(D_0152 == 3) {
 			D_0152 = 0;
 			D_00EA = 2;
-			C_1B09(++D_00EA);
+			load_level_assets(++D_00EA);
 			D_0130 = 6;
 			D_012E = 1;
 			D_0142[D_0130] = 1;
@@ -134,8 +134,8 @@ C_3233()
 			case 0:
 				/*akuma sends a fighter*/
 				Cutscene(/*D510*/"cal07a", 7);
-				C_1B09(++D_00EA);
-				LoadBCGAt(/*D517*/"fuji.bcg", 1500);
+				load_level_assets(++D_00EA);
+				load_background_graphics(/*D517*/"fuji.bcg", 1500);
 				D_0118 = 0x20;
 				D_0110 = 0x46;
 				D_CC78 = D_CC7A[0xe];
@@ -145,8 +145,8 @@ C_3233()
 			case 1:
 				/*mariko waits in cell*/
 				Cutscene(/*D520*/"cal04", 8);
-				C_1B09(++D_00EA);
-				LoadBCGAt(/*D517*/"fuji.bcg", 1500);
+				load_level_assets(++D_00EA);
+				load_background_graphics(/*D517*/"fuji.bcg", 1500);
 				D_010E = 200;
 				D_00E2 = 1;
 				D_0166 = 9;
@@ -162,7 +162,7 @@ C_3233()
 				Cutscene(/*D526*/"cal05", 0xa);
 				D_0130 = 1;
 				D_B9BA = -1;
-				C_1B09(++D_00EA);
+				load_level_assets(++D_00EA);
 				D_0102 = D_BB65;
 				D_012E = 1;
 				D_00FA = 0;
@@ -176,8 +176,8 @@ C_3233()
 					if(++D_0130 == 7) {/*else 366A*/
 						/*akuma kicks, mariko stands*/
 						Cutscene(/*D52C*/"cal06", 0xc);
-						C_1B09(++D_00EA);
-						LoadScript(/*D532*/"allval", D_CCCE);
+						load_level_assets(++D_00EA);
+						load_animation_script(/*D532*/"allval", D_CCCE);
 						C_19E9();/*make indexes for D_CCCE*/
 						D_0130 = 6;
 						C_3AC0(D_0130);
@@ -248,9 +248,9 @@ C_3233()
 				C_3AC0(D_0130);
 				if(D_0130 == 7) {/*else 37A1*/
 					D_0104 = 0xac;
-					LoadScript(/*D539*/"cal03", D_BB94);
-					C_1090(0xb);/*load ks/km files*/
-					LoadScript(/*D53F*/"prngal", D_CCCE);
+					load_animation_script(/*D539*/"cal03", D_BB94);
+					load_sprite_assets(0xb);/*load ks/km files*/
+					load_animation_script(/*D53F*/"prngal", D_CCCE);
 					C_19E9();/*make indexes for D_CCCE*/
 					D_00FA = 0;
 					D_010E = 200;
@@ -287,8 +287,8 @@ C_3233()
 			if(D_00E2 == 1 && D_00EA == 2) {/*else 38E4*/
 				/*akuma sends a fighter*/
 				Cutscene(/*D546*/"cal07", 9);
-				C_1090(2);/*load ks/km files*/
-				LoadBCGAt(/*D517*/"fuji.bcg", 1500);
+				load_sprite_assets(2);/*load ks/km files*/
+				load_background_graphics(/*D517*/"fuji.bcg", 1500);
 				C_1C9F(D_00EA);
 				D_0118 = 0x20;
 				D_0110 = 0x46;

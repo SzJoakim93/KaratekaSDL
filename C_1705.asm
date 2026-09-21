@@ -25,8 +25,8 @@ EXTRN D_D4E2:WORD
 
 EXTRN BB_clear:NEAR	;0BB7
 EXTRN render:NEAR	;0C32
-EXTRN C_1090:NEAR	;load ks/km files
-EXTRN LoadScript:NEAR	;12E0
+EXTRN load_sprite_assets:NEAR	;load ks/km files
+EXTRN load_animation_script:NEAR	;12E0
 EXTRN DoInput:NEAR	;41BE
 EXTRN GetKey:NEAR	;4299
 
@@ -414,12 +414,12 @@ Cutscene:
 	MOV	D_BB70,BP	;backup BP
 	PUSH	AX
 	PUSH	[BP+04]
-	CALL	LoadScript
+	CALL	load_animation_script
 	ADD	SP,4
 	MOV	BP,D_BB70	;restore BP
 
 	PUSH	[BP+06]
-	CALL	C_1090	;load ks/km files
+	CALL	load_sprite_assets	;load ks/km files
 	ADD	SP,2
 	MOV	BP,D_BB70	;restore BP
 

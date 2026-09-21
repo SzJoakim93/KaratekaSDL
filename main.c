@@ -258,15 +258,15 @@ C_03DE()
 	D_00F6 =
 	D_015C =
 	D_015A = 0;
-	LoadScript(/*41CF*/"allgal", D_CCCE);
+	load_animation_script(/*41CF*/"allgal", D_CCCE);
 	C_19E9();/*make indexes for D_CCCE*/
-	LoadBCGAt(/*41D6*/"fuji.bcg", 1500);
+	load_background_graphics(/*41D6*/"fuji.bcg", 1500);
 	D_00EA = 0;
-	C_1B09(D_00EA);/*load level data*/
+	load_level_assets(D_00EA);/*load level data*/
 	/*intro loop*/
 	for(;;) {/*0429*/
 		D_DE70 = 0;
-		C_1090(0xd);/*load ks/km files*/
+		load_sprite_assets(0xd);/*load ks/km files*/
 		/*-- first time --*/
 		if(D_41B7) {
 			if(C_4300() == 7) {
@@ -275,7 +275,7 @@ C_03DE()
 			}
 			if(!C_440E()) {
 				puts(/*4255*/"Karateka needs a graphics adapter card to operate correctly.");
-				exit();
+				exit(1);
 			}
 			if(!C_46CC()) {
 				D_DE72 = 1;
@@ -290,7 +290,7 @@ C_03DE()
 			C_0616();/*little intro*/
 			break;
 		}
-		LoadBCGAt(/*4292*/"title.bcg", 0);
+		load_background_graphics(/*4292*/"title.bcg", 0);
 		if(C_3FE4()) {/*"a game by jordan mechner"*/
 			C_0616();/*little intro*/
 			break;
@@ -311,16 +311,16 @@ C_03DE()
 		BB_clear();
 		D_00EE = 1;
 		D_00EA = 4;
-		LoadScript(/*429C*/"cal00", D_BB94);
-		C_1090(6);/*load ks/km files*/
+		load_animation_script(/*429C*/"cal00", D_BB94);
+		load_sprite_assets(6);/*load ks/km files*/
 		if(C_177B()) {/*execute script/animation?*/
 			C_0616();/*little intro*/
 			break;
 		}
 		D_00EA = 0;
-		LoadScript(/*42A2*/"cal01", D_BB94);
-		LoadBCGAt(/*41D6*/"fuji.bcg", 1500);
-		C_1B09(0);/*load level data*/
+		load_animation_script(/*42A2*/"cal01", D_BB94);
+		load_background_graphics(/*41D6*/"fuji.bcg", 1500);
+		load_level_assets(0);/*load level data*/
 		if(C_177B()) {/*execute script/animation?*/
 			C_064E();
 			break;
@@ -390,20 +390,20 @@ C_05D2()
 /*little intro*/
 C_0616()
 {
-	C_1024();/*draw "castle.bcg"*/
-	LoadBCGAt(/*41D6*/"fuji.bcg", 1500);
-	C_1B09(0);/*load level data*/
+	load_castle_bg();/*draw "castle.bcg"*/
+	load_background_graphics(/*41D6*/"fuji.bcg", 1500);
+	load_level_assets(0);/*load level data*/
 	BB_clear();
 	D_00EA = 0;
 	D_DE70 = 0;
-	LoadScript(/*42A2*/"cal01", D_BB94);
+	load_animation_script(/*42A2*/"cal01", D_BB94);
 	C_177B();/*execute script/animation?*/
 }
 
 C_064E()
 {
-	LoadBCGAt(/*41D6*/"fuji.bcg", 1500);
-	C_1B09(0);/*load level data*/
+	load_background_graphics(/*41D6*/"fuji.bcg", 1500);
+	load_level_assets(0);/*load level data*/
 	BB_clear();
 	D_DE70 = 0;
 }

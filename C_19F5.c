@@ -34,14 +34,14 @@ C_19F5()
 {
 	char dummy[4];
 
-	LoadScript(/*D42C*/"allpal", D_C2B8);
+	load_animation_script(/*D42C*/"allpal", D_C2B8);
 	C_19BD();/*make indexes for D_C2B8*/
 	D_015E = 0;
 	km_base = 0;
 	D_0162 = 0;
 	ks_base = 0;
 	D_0172 = 0;
-	C_1090(5);/*load ks/km files*/
+	load_sprite_assets(5);/*load ks/km files*/
 }
 
 C_1A35(bp10)
@@ -73,14 +73,14 @@ int bp10;
 	D_C234 = D_C254[0];
 }
 
-C_1B09(bp08)
+load_level_assets(bp08)
 int bp08;
 {
 	int dummy;
 
-	C_1090(bp08);/*load ks/km files*/
+	load_sprite_assets(bp08);/*load ks/km files*/
 	if(bp08 < 4) {
-		LoadScript(D_021C[bp08], D_BF92);
+		load_animation_script(D_021C[bp08], D_BF92);
 		if(bp08 < 2)
 			C_1A35(1);
 		else
