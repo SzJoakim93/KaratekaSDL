@@ -156,7 +156,7 @@ int D_41B9 = 0;
 /*42A2	"cal01"*/
 /*---- ----*/
 
-/*0255*/main()
+/*0255*/main(int argc, char* args[])
 {
 	int bp02;
 
@@ -166,6 +166,10 @@ int D_41B9 = 0;
 	C_48E2();/*set int 24h*/
 	C_4718();/*speed related function*/
 	D_DE72 = 1;
+
+	/* Allocate the dynamically sized render buffer (D_B9C0). */
+	init_dynamic_buffers();
+
 	for(;;) {
 		if(C_1705(D_0337))/*check copy*/
 			break;
@@ -177,6 +181,7 @@ int D_41B9 = 0;
 		WaitKey();
 	}/*end for*/
 	/*-- main loop --*//*02B7*/
+	init_sdl_graphics();
 	for(;;) {
 		D_016A = 1;
 		C_19F5();/*load 'allpal' script*/
@@ -247,6 +252,9 @@ int D_41B9 = 0;
 			DrMeters();
 		}/*end while*/
 	}/*end for*/
+
+	SDL_Quit();
+	return 0;
 }
 
 /*intro and demo*/

@@ -6,8 +6,8 @@
 
 */
 #include <stdio.h>
-#include <fcntl.h>
 
+#include "fcntl.h"
 #include "karateka.h"
 
 /*bb08	"castle.bcg"*/
@@ -232,14 +232,18 @@ int *bp1c;
 	}/*end switch*/
 }
 
-/*16D6*/safe_open(fname, attr)
+/*16D6*/open_file_safe(fname, attr)
 char *fname;
 int attr;
 {
+#ifdef USE_SDL
+	return open(fname, attr);
+#else
 	int h;
 
 	while((h = open(fname, attr)) == -1)
 		C_402A();/*int24h handler*/
 
 	return h;
+#endif
 }

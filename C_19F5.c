@@ -300,7 +300,7 @@ C_1F86() {
 	bp02 = Question(D_DE49);/*" press q to quit| d for demo"*/
 	if(bp02 == 'Q' || bp02 == 'q') {
 		C_4426();
-		exit();
+		exit(0);
 	} else if(bp02 == 'D' || bp02 == 'd') {
 		D_016A =
 		D_DE70 = 1;

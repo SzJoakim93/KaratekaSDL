@@ -3,8 +3,10 @@
 	Copyright 1986 Jordan Mechner
 	IBM version by The Connelley Group
 	reverse-coded by ergonomy_joe 2022
-
 */
+
+#include "dos_sdl_bridge.h"
+
 /*---- ----*/
 extern int D_00E2;
 extern int D_00E4;
@@ -139,3 +141,6 @@ extern char D_E0CC;
 extern char D_E0CD;
 extern char D_E0CE;
 /*---- ----*/
+/* Include central table/variable declarations */
+#include "tables.h"
+
