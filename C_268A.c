@@ -12,7 +12,6 @@ int D_D43A = 0;
 int D_D43C = 0;
 int D_D43E = 0;
 int D_D440 = 0;
-int D_D442 = 0;
 
 int D_D444[][5] = {
 	0xFF,0xFF,0xC0,0xB0,0x90,

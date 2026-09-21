@@ -87,18 +87,9 @@ extern char D_0337[/*0x3e80=16000*/];
 
 extern int D_41B9;
 
-/*42CA*/extern char ks_index[];
-/*44CA*/extern char ks_data[];
-/*866A*/extern char km_index[];
-/*886A*/extern char km_data[];
-extern char D_A606[];
-
 extern int D_B9BA;
 
-extern int D_BB65;
-
 extern int D_BB92;
-extern int D_BB94[];
 
 extern char D_BF92[];
 
@@ -111,30 +102,15 @@ extern char *D_C246[/*7*/];
 extern char *D_C254[/*7*/];
 extern int D_C262;
 extern int D_C264[/*0x2a*/];
-extern char D_C2B8[/*0x9c0*/];
+extern char D_C2B8[0x4000];
 extern int D_CC78;
 extern int D_CC7A[/*0x2a*/];
-extern char D_CCCE[/*0x75e*/];
+extern char D_CCCE[0x4000];
 
 extern int D_D43A;
 extern int D_D43C;
 extern int D_D43E;
 extern int D_D440;
-
-extern int D_D4E0;
-extern int D_D4E2;
-
-extern char D_DE68;
-extern char D_DE69;
-
-extern char D_DD8A[];/*"make sure your karateka"*/
-extern char D_DDB6[];/*"press any key to continue"*/
-extern char D_DDD0[];/*"center joystick and press a key{"*/
-extern char D_DE2B[];/*" no joystick{  press any key{"*/
-extern char D_DE49[];/*" press q to quit| d for demo"*/
-
-extern int D_DE70;
-extern int D_DE72;
 
 extern char D_E0CB;
 extern char D_E0CC;

@@ -68,7 +68,6 @@ int D_015E = 0;
 int D_0162 = 0;
 /*0164*/int km_base = 0;
 int D_0166 = 0;
-int D_0168 = 0;
 int D_016A = 0;
 int D_016C = 0;
 int D_016E = 0;
