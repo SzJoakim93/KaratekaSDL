@@ -19,13 +19,13 @@ extern const short        D_E07E[12];
 extern const unsigned char D_E0A2[18];
 
 /* Index and data tables used by the graphics engine */
-extern unsigned char ks_index[0x100];
+extern unsigned char ks_index[0x200];
 extern unsigned char  ks_data[0x41A0];
-extern unsigned char km_index[0x100];
+extern unsigned char km_index[0x200];
 extern unsigned char  km_data[0x1D9C];
 
 /* Graphics / asset buffers */
-extern unsigned char D_A606[0x1040];   /* background tile data */
+extern unsigned char D_A606[0x10F4];   /* background tile data */
 extern unsigned char *D_B9C0;         /* dynamically allocated render buffer */
 
 /* Misc string literals – exact length matches the original comments */
@@ -41,7 +41,7 @@ extern unsigned char D_DE68; /* Last key pressed */
 extern unsigned char D_DE69; /* Key pending flag */
 
 extern unsigned char D_BB60;
-extern unsigned char D_BB94[];
+extern unsigned char D_BB94[0x400];
 extern unsigned char D_BB65;
 extern unsigned char D_DE70;
 extern unsigned char D_DE72;

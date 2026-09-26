@@ -39,15 +39,15 @@ const unsigned char D_E0A2[18] = {
    Index / data tables – zero‑initialised; they will be filled at
    runtime by the asset‑loading code.
    ------------------------------------------------------------------ */
-unsigned char ks_index[0x100] = {0};
+unsigned char ks_index[0x200] = {0};
 unsigned char  ks_data[0x41A0] = {0};
-unsigned char km_index[0x100] = {0};
+unsigned char km_index[0x200] = {0};
 unsigned char  km_data[0x1D9C] = {0};
 
 /* ------------------------------------------------------------------
    Graphics / asset buffers
    ------------------------------------------------------------------ */
-unsigned char D_A606[0x1040] = {0};
+unsigned char D_A606[0x10F4] = {0};
 
 /* Dynamic render buffer – allocated on program start */
 unsigned char *D_B9C0 = NULL;
@@ -75,7 +75,7 @@ unsigned char D_DE68 = 0; /* Last key pressed */
 unsigned char D_DE69 = 0; /* Key pending flag */
 
 unsigned char D_BB60 = 0;
-unsigned char D_BB94[] = {
+unsigned char D_BB94[0x400] = {
    0x04, 0x02, 0x64, 0x00, 0x64,
    0x04, 0x01, 0x96, 0x00, 0x64,
    0x08,

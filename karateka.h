@@ -91,31 +91,31 @@ extern int D_B9BA;
 
 extern int D_BB92;
 
-extern char D_BF92[];
+extern unsigned char D_BF92[];
 
-extern char *D_C230;
-extern char *D_C232;
-extern char *D_C234;
+extern unsigned char *D_C230;
+extern unsigned char *D_C232;
+extern unsigned char *D_C234;
 extern int D_C236;
-extern char *D_C238[/*7*/];
-extern char *D_C246[/*7*/];
-extern char *D_C254[/*7*/];
+extern unsigned char *D_C238[/*7*/];
+extern unsigned char *D_C246[/*7*/];
+extern unsigned char *D_C254[/*7*/];
 extern int D_C262;
 extern int D_C264[/*0x2a*/];
-extern char D_C2B8[0x4000];
+extern unsigned char D_C2B8[0x4000];
 extern int D_CC78;
 extern int D_CC7A[/*0x2a*/];
-extern char D_CCCE[0x4000];
+extern unsigned char D_CCCE[0x4000];
 
 extern int D_D43A;
 extern int D_D43C;
 extern int D_D43E;
 extern int D_D440;
 
-extern char D_E0CB;
-extern char D_E0CC;
-extern char D_E0CD;
-extern char D_E0CE;
+extern unsigned char D_E0CB;
+extern unsigned char D_E0CC;
+extern unsigned char D_E0CD;
+extern unsigned char D_E0CE;
 /*---- ----*/
 /* Include central table/variable declarations */
 #include "tables.h"

@@ -122,8 +122,8 @@ int idx;
 	/*-- --*/
 }
 
-/*12E0*/load_animation_script(bp6a, bp6c)
-char *bp6a;
+/*12E0*/load_animation_script(path, bp6c)
+char *path;
 char *bp6c;
 {
 	char bp02[0x50];
@@ -138,17 +138,17 @@ char *bp6c;
 	bp5e =
 	bp5a = 0;
 
-	while(!(f = fopen(bp6a, /*bb13*/"r")))
+	while(!(f = fopen(path, /*bb13*/"r")))
 		C_402A();/*int24h handler*/
 	while((bp52 = fgets(bp02, 0x50, f)) != 0)
-		C_1354(bp02, bp6c, &bp5a, &bp5e);
+		parse_script_line(bp02, bp6c, &bp5a, &bp5e);
 	fclose(f);
 	D_BB92 = bp5a;
 
 	return bp5e;
 }
 
-C_1354(bp16, bp18, bp1a, bp1c)
+parse_script_line(bp16, bp18, bp1a, bp1c)
 char *bp16;
 char *bp18;
 int *bp1a;
@@ -159,9 +159,16 @@ int *bp1c;
 	int bp0c;
 	int bp0e;
 	char bp10;
+	char *comma;
+	int parsed_val1, parsed_val2;
 
-	for(bp08 = 0; bp16[bp08] != ','; bp08 ++);
+	comma = strchr(bp16, ',');
+	if (!comma) {
+		return;
+	}
+	bp08 = comma - bp16;
 	bp16[bp08] = 0;
+
 	for(bp0a = 0; bp0a < 0xe; bp0a ++) {
 		bp10 = strncmp(bp16, D_01E8[bp0a], 5);
 		if(bp10 == 0)
@@ -173,32 +180,60 @@ int *bp1c;
 	switch(bp0a) {
 		case 0:/*set_tune*/
 			bp18[(*bp1a) ++] = 0;
-			sscanf(&(bp16[bp08 + 1]), /*bb15*/"%d", bp18 + (*bp1a) ++);
+			if (sscanf(&(bp16[bp08 + 1]), "%d", &parsed_val1) == 1) {
+				bp18[(*bp1a) ++] = parsed_val1;
+			} else {
+				bp18[(*bp1a) ++] = 0;
+			}
 		break;
 		case 1:/*set_bg*/
 			bp18[(*bp1a) ++] = 2;
-			sscanf(&(bp16[bp08 + 1]), /*bb15*/"%d", bp18 + (*bp1a) ++);
+			if (sscanf(&(bp16[bp08 + 1]), "%d", &parsed_val1) == 1) {
+				bp18[(*bp1a) ++] = parsed_val1;
+			} else {
+				bp18[(*bp1a) ++] = 0;
+			}
 		break;
 		case 2:/*set_fig*/
 			bp18[(*bp1a) ++] = 4;
-			sscanf(&(bp16[bp08 + 1]), /*BB18*/"%d %d %d", bp18 + (*bp1a) ++, &bp0c, &bp0e);
-			bp18[(*bp1a) ++] = bp0c & 0xff;
-			bp18[(*bp1a) ++] = bp0c >> 8;
-			bp18[(*bp1a) ++] = bp0e;
+			if (sscanf(&(bp16[bp08 + 1]), "%d %d %d", &parsed_val1, &bp0c, &bp0e) == 3) {
+				bp18[(*bp1a) ++] = parsed_val1;
+				bp18[(*bp1a) ++] = bp0c & 0xff;
+				bp18[(*bp1a) ++] = bp0c >> 8;
+				bp18[(*bp1a) ++] = bp0e;
+			} else {
+				bp18[(*bp1a) ++] = 0;
+				bp18[(*bp1a) ++] = 0;
+				bp18[(*bp1a) ++] = 0;
+				bp18[(*bp1a) ++] = 0;
+			}
 		break;
 		case 3:/*chg_fig*/
 			bp18[(*bp1a) ++] = 6;
-			sscanf(&(bp16[bp08 + 1]), /*BB21*/"%d %d %d %d", bp18 + (*bp1a) ++, bp18 + (*bp1a) ++, &bp0c, &bp0e);
-			bp18[(*bp1a) ++] = bp0c & 0xff;
-			bp18[(*bp1a) ++] = bp0c >> 8;
-			bp18[(*bp1a) ++] = bp0e;
+			if (sscanf(&(bp16[bp08 + 1]), "%d %d %d %d", &parsed_val1, &parsed_val2, &bp0c, &bp0e) == 4) {
+				bp18[(*bp1a) ++] = parsed_val1;
+				bp18[(*bp1a) ++] = parsed_val2;
+				bp18[(*bp1a) ++] = bp0c & 0xff;
+				bp18[(*bp1a) ++] = bp0c >> 8;
+				bp18[(*bp1a) ++] = bp0e;
+			} else {
+				bp18[(*bp1a) ++] = 0;
+				bp18[(*bp1a) ++] = 0;
+				bp18[(*bp1a) ++] = 0;
+				bp18[(*bp1a) ++] = 0;
+				bp18[(*bp1a) ++] = 0;
+			}
 		break;
 		case 4:/*do_scr*/
 			bp18[(*bp1a) ++] = 8;
 		break;
 		case 5:/*del_fig*/
 			bp18[(*bp1a) ++] = 0xa;
-			sscanf(&(bp16[bp08 + 1]), /*bb15*/"%d", bp18 + (*bp1a) ++);
+			if (sscanf(&(bp16[bp08 + 1]), "%d", &parsed_val1) == 1) {
+				bp18[(*bp1a) ++] = parsed_val1;
+			} else {
+				bp18[(*bp1a) ++] = 0;
+			}
 		break;
 		case 6:/*set_wipe*/
 			bp18[(*bp1a) ++] = 0xc;
@@ -208,23 +243,40 @@ int *bp1c;
 		break;
 		case 8:/*wait*/
 			bp18[(*bp1a) ++] = 0x10;
-			sscanf(&(bp16[bp08 + 1]), /*bb15*/"%d", bp18 + (*bp1a) ++);
+			if (sscanf(&(bp16[bp08 + 1]), "%d", &parsed_val1) == 1) {
+				bp18[(*bp1a) ++] = parsed_val1;
+			} else {
+				bp18[(*bp1a) ++] = 0;
+			}
 		break;
 		case 9:/*init_sal*/
 			bp18[(*bp1a) ++] = 0x12;
 		break;
 		case 10:/*set_pos*/
 			bp18[(*bp1a) ++] = 0x14;
-			sscanf(&(bp16[bp08 + 1]), /*bb2d*/"%d %d", bp18 + (*bp1a) ++, bp18 + (*bp1a) ++);
+			if (sscanf(&(bp16[bp08 + 1]), "%d %d", &parsed_val1, &parsed_val2) == 2) {
+				bp18[(*bp1a) ++] = parsed_val1;
+				bp18[(*bp1a) ++] = parsed_val2;
+			} else {
+				bp18[(*bp1a) ++] = 0;
+				bp18[(*bp1a) ++] = 0;
+			}
 		break;
 		case 11:/*inc_x*/
 			bp18[(*bp1a) ++] = 0x16;
-			sscanf(&(bp16[bp08 + 1]), /*bb15*/"%d", &bp0c);
-			bp18[(*bp1a) ++] = bp0c & 0xff;
+			if (sscanf(&(bp16[bp08 + 1]), "%d", &bp0c) == 1) {
+				bp18[(*bp1a) ++] = bp0c & 0xff;
+			} else {
+				bp18[(*bp1a) ++] = 0;
+			}
 		break;
 		case 12:/*loop*/
 			bp18[(*bp1a) ++] = 0x18;
-			sscanf(&(bp16[bp08 + 1]), /*bb15*/"%d", bp18 + (*bp1a) ++);
+			if (sscanf(&(bp16[bp08 + 1]), "%d", &parsed_val1) == 1) {
+				bp18[(*bp1a) ++] = parsed_val1;
+			} else {
+				bp18[(*bp1a) ++] = 0;
+			}
 		break;
 		case 13:/*end_animation*/
 			bp18[(*bp1a) ++] = 0xff;

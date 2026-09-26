@@ -8,22 +8,22 @@
 #include "karateka.h"
 
 /*---- ----*/
-char D_BF92[0x29E];
-char *D_C230 = D_BF92;
-char *D_C232 = D_BF92;
-char *D_C234 = D_BF92;
+unsigned char D_BF92[0x10000];
+unsigned char *D_C230 = D_BF92;
+unsigned char *D_C232 = D_BF92;
+unsigned char *D_C234 = D_BF92;
 int D_C236 = 0;
-char *D_C238[7];
-char *D_C246[7];
-char *D_C254[7];
+unsigned char *D_C238[7];
+unsigned char *D_C246[7];
+unsigned char *D_C254[7];
 /*-- --*/
 int D_C262 = 0;
 int D_C264[0x2A];/*indexes in script D_C2B8*/
-char D_C2B8[0x9C0];
+unsigned char D_C2B8[0x4000];
 /*-- --*/
 int D_CC78 = 0;
 int D_CC7A[0x2A];/*indexes in script D_CCCE*/
-char D_CCCE[0x75E];
+unsigned char D_CCCE[0x4000];
 /*-- --*/
 /*d42c	"allpal"*/
 /*d433	0*/
@@ -32,7 +32,7 @@ char D_CCCE[0x75E];
 /*load 'allpal' script*/
 C_19F5()
 {
-	char dummy[4];
+	unsigned char dummy[4];
 
 	load_animation_script(/*D42C*/"allpal", D_C2B8);
 	C_19BD();/*make indexes for D_C2B8*/
@@ -60,8 +60,9 @@ int bp10;
 				D_C246[bp0a] = &(D_BF92[bp06]);
 				bp04 ++;
 			}
-			if(D_BF92[bp04] == 0xff)
+			if(D_BF92[bp04] == 0xff || bp04 > 0x10000 + 5 || bp06 > 0x10000)
 				break;
+
 			for(bp08 = 1; bp08 < 5; bp08 ++)
 				D_BF92[bp06 ++] = D_BF92[bp04 + bp08];
 			bp04 += 5;
