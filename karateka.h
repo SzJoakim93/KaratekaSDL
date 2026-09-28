@@ -83,7 +83,7 @@ extern int D_0318[];
 extern char D_0322[];
 extern char D_032D[];/*".ind"*/
 extern char D_0332[];/*".dat"*/
-extern char D_0337[/*0x3e80=16000*/];
+extern char cga_buffer[/*0x3e80=16000*/];
 
 extern int D_41B9;
 

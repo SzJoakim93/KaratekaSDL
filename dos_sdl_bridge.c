@@ -8,13 +8,12 @@
 #include "dos_sdl_bridge.h"
 
 /* External reference to the CGA linear backbuffer */
-extern char D_0337[16000];
+extern char cga_buffer[16000];
 
 #ifdef USE_SDL
 
 static SDL_Surface* screen = NULL;
 static SDL_Surface* texture = NULL;
-static unsigned int pixels[640 * 400];
 
 /* High intensity CGA Palette 1 colors */
 static const unsigned int cga_palette[4] = {
@@ -40,7 +39,7 @@ void init_sdl_graphics(void)
 	screen = SDL_SetVideoMode(
 		640,
 		400,
-		8,
+		32,
 		SDL_SWSURFACE | SDL_ANYFORMAT
 	);
 
@@ -53,11 +52,11 @@ void init_sdl_graphics(void)
 		0,
 		640,
 		400,
-		8,
-		0,
-		0,
-		0,
-		0
+		32,
+		0x00FF0000,
+		0x0000FF00,
+		0x000000FF,
+		0xFF000000
 	);
 
 	if (!texture) {
@@ -65,7 +64,6 @@ void init_sdl_graphics(void)
 		return;
 	}
 
-	memset(pixels, 0, sizeof(pixels));
 	SDL_FillRect(screen, NULL, 0);
 	SDL_Flip(screen);
 #endif
@@ -90,7 +88,7 @@ void close_sdl_graphics(void)
 /* Clear CGA backbuffer to Color 0 */
 void BB_clear(void)
 {
-	memset(D_0337, 0, 16000);
+	memset(cga_buffer, 0, 16000);
 }
 
 /* Present linear CGA backbuffer to 640x400 window with 2x integer scale */
@@ -99,12 +97,15 @@ void BB_flip(void)
 #ifdef USE_SDL
 	int x, y;
 	if (!texture) return;
+	if (SDL_MUSTLOCK(texture)) SDL_LockSurface(texture);
+
+	Uint32 *pixels = (Uint32*)texture->pixels;
 
 	for (y = 0; y < 200; y++) {
 		for (x = 0; x < 320; x++) {
 			int byte_idx = y * 80 + (x / 4);
 			int pixel_shift = 6 - (2 * (x % 4));
-			int color_idx = (D_0337[byte_idx] >> pixel_shift) & 0x03;
+			int color_idx = (cga_buffer[byte_idx] >> pixel_shift) & 0x03;
 			unsigned int color = cga_palette[color_idx];
 
 			/* Upscale 320x200 pixel to 2x2 grid in 640x400 display */
@@ -117,6 +118,8 @@ void BB_flip(void)
 			pixels[(dest_y + 1) * 640 + (dest_x + 1)] = color;
 		}
 	}
+
+	if (SDL_MUSTLOCK(texture)) SDL_UnlockSurface(texture);
 
 	SDL_BlitSurface(texture, NULL, screen, NULL);
 	SDL_Flip(screen);

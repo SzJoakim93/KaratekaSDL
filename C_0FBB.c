@@ -46,9 +46,9 @@ load_castle_bg()
 	BB_clear();
 
 	h = open_file_safe(/*bb08*/"castle.bcg", O_RDONLY|O_RAW);
-	read(h, D_0337, 2);
-	bp06 = D_0337[0] + (D_0337[1] << 8);
-	read(h, D_0337, bp06);
+	read(h, cga_buffer, 2);
+	bp06 = cga_buffer[0] + (cga_buffer[1] << 8);
+	read(h, cga_buffer, bp06);
 	close(h);
 
 	BB_flip();

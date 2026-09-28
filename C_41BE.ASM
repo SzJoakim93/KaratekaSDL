@@ -13,7 +13,7 @@ EXTRN D_010E:WORD
 EXTRN D_0130:WORD
 EXTRN D_0168:WORD	;allows CTRL+V?
 EXTRN D_016A:WORD	;allows CTRL+R/'J'/F1?
-EXTRN D_0337:BYTE
+EXTRN cga_buffer:BYTE
 
 EXTRN D_B9BE:WORD
 EXTRN D_B9C0:BYTE
@@ -189,7 +189,7 @@ C_4241:	;--
 	JNZ	C_425F
 	;-- version string --
 	CALL	Beep
-	LEA	DI,D_0337[3AE4h]
+	LEA	DI,cga_buffer[3AE4h]
 	LEA	SI,[D_DE6A]	;"v i{i"
 	CALL	k_puts
 	CALL	BB_flip

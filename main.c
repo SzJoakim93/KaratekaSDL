@@ -141,7 +141,7 @@ int D_0318[5] = {0x060,0x024,0x020,0x000,0x000};
 char D_0322[0xb] = "qazwsx46 b0";
 char D_032D[] = ".ind";
 char D_0332[] = ".dat";
-char D_0337[16000];
+char cga_buffer[16000];
 int D_41B7 = 1;
 int D_41B9 = 0;
 /*41bb	"disk is in drive a."*/
@@ -170,9 +170,9 @@ int D_41B9 = 0;
 	init_dynamic_buffers();
 
 	for(;;) {
-		if(C_1705(D_0337))/*check copy*/
+		if(C_1705(cga_buffer))/*check copy*/
 			break;
-		if(C_1705(D_0337+0x400))/*check copy*/
+		if(C_1705(cga_buffer+0x400))/*check copy*/
 			break;
 		puts(D_DD8A);/*"make sure your karateka"*/
 		puts(/*41BB*/"disk is in drive a.");

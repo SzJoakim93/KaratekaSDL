@@ -4,7 +4,7 @@
 ;	IBM version by The Connelley Group
 ;	reverse-coded by ergonomy_joe 2022
 ;========================================
-EXTRN D_0337:BYTE
+EXTRN cga_buffer:BYTE
 
 EXTRN D_B6FA:WORD
 
@@ -1024,7 +1024,7 @@ C_3F83:
 	CALL	BB_clear
 	CALL	BB_flip
 	
-	LEA	DI,D_0337[1D7Fh]
+	LEA	DI,cga_buffer[1D7Fh]
 	LEA	SI,[D_DD46]	;"the end"
 	CALL	k_puts
 	
@@ -1044,7 +1044,7 @@ C_3F9E:
 	;-- --
 	PUSH	WORD PTR D_DC50
 	LEA	SI,[D_DC51]
-	LEA	DI,D_0337[640h]
+	LEA	DI,cga_buffer[640h]
 C_3FB3:
 	PUSH	DI
 	CALL	k_puts
@@ -1077,11 +1077,11 @@ PUBLIC C_3FE4
 C_3FE4:
 	CALL	BB_clear
 	
-	LEA	DI,D_0337[1A5Bh]
+	LEA	DI,cga_buffer[1A5Bh]
 	LEA	SI,[D_DD4E]	;"a game by"
 	CALL	k_puts
 	
-	LEA	DI,D_0337[1F54h]
+	LEA	DI,cga_buffer[1F54h]
 	LEA	SI,[D_DD58]	;"jordan mechner"
 	CALL	k_puts
 	
@@ -1096,11 +1096,11 @@ PUBLIC C_4007
 C_4007:
 	CALL	BB_clear
 	
-	LEA	DI,D_0337[1A56h]
+	LEA	DI,cga_buffer[1A56h]
 	LEA	SI,[D_DD67]	;"ibm version by"
 	CALL	k_puts
 	
-	LEA	DI,D_0337[1F50h]
+	LEA	DI,cga_buffer[1F50h]
 	LEA	SI,[D_DD76]	;"the connelley group"
 	CALL	k_puts
 	
@@ -1116,15 +1116,15 @@ PUBLIC C_402A
 C_402A:
 	CALL	BB_clear
 	
-	LEA	DI,D_0337[17CAh]
+	LEA	DI,cga_buffer[17CAh]
 	LEA	SI,[D_DD8A]	;"make sure your karateka"
 	CALL	k_puts
 	
-	LEA	DI,D_0337[1CD2h]
+	LEA	DI,cga_buffer[1CD2h]
 	LEA	SI,[D_DDA2]	;"disk is in drive a{"
 	CALL	k_puts
 	
-	LEA	DI,D_0337[21C8h]
+	LEA	DI,cga_buffer[21C8h]
 	LEA	SI,[D_DDB6]	;"press any key to continue"
 	CALL	k_puts
 	
@@ -1137,15 +1137,15 @@ PUBLIC C_4055
 C_4055:
 	CALL	BB_clear
 	
-	LEA	DI,D_0337[17C2h]
+	LEA	DI,cga_buffer[17C2h]
 	LEA	SI,[D_DDD0]	;"center joystick and press a key{"
 	CALL	k_puts
 	
-	LEA	DI,D_0337[21C4h]
+	LEA	DI,cga_buffer[21C4h]
 	LEA	SI,[D_DDF1]	;"press j to re~adjust joystick"
 	CALL	k_puts
 	
-	LEA	DI,D_0337[26C5h]
+	LEA	DI,cga_buffer[26C5h]
 	LEA	SI,[D_DE0F]	;"when necessary during game{"
 	CALL	k_puts
 	
@@ -1162,7 +1162,7 @@ Question:
 	;--
 	CALL	ClearBottom
 
-	LEA	DI,D_0337[3AC2h]
+	LEA	DI,cga_buffer[3AC2h]
 	MOV	SI,[BP+04]
 	CALL	k_puts
 
@@ -1181,7 +1181,7 @@ C_409D:
 C_40A3:
 	;-- --
 	MOV	SI,D_DC4E
-	LEA	DI,[D_0337]
+	LEA	DI,[cga_buffer]
 	XOR	AX,AX
 	MOV	CX,4B0h
 	PUSH	ES
@@ -1189,7 +1189,7 @@ C_40A3:
 	POP	ES
 	REPZ	STOSW
 	POP	ES
-	LEA	DI,[D_0337]
+	LEA	DI,[cga_buffer]
 	CALL	k_puts
 	INC	SI
 	MOV	D_DC4E,SI
@@ -1211,7 +1211,7 @@ C_40C6:
 	JB	C_40C6
 
 	MOV	DI,[D_DE85 + 18Eh]	;E013
-	LEA	SI,[D_0337]
+	LEA	SI,[cga_buffer]
 	ADD	SI,DX
 	MOV	CX,28h
 	REPZ	MOVSW

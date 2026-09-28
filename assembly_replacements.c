@@ -78,9 +78,9 @@ static void write_pixel(int px, int py, unsigned char color_val)
 	int pixel_shift = 6 - (2 * (px % 4));
 	
 	/* Clear the 2 bits for this pixel */
-	D_0337[byte_idx] &= ~(0x03 << pixel_shift);
+	cga_buffer[byte_idx] &= ~(0x03 << pixel_shift);
 	/* Set the new 2 bits */
-	D_0337[byte_idx] |= (color_val & 0x03) << pixel_shift;
+	cga_buffer[byte_idx] |= (color_val & 0x03) << pixel_shift;
 }
 
 /* Pseudo-random number generator mapping to original Prime LCG */
@@ -188,10 +188,10 @@ static void C_0E39(void)
 {
 	if (D_00EA < 2) {
 		/* Clear 42 rows starting at row 114 */
-		memset(&D_0337[114 * 80], 0, 42 * 80);
+		memset(&cga_buffer[114 * 80], 0, 42 * 80);
 	} else {
 		/* Clear 48 rows starting at row 108 */
-		memset(&D_0337[108 * 80], 0, 48 * 80);
+		memset(&cga_buffer[108 * 80], 0, 48 * 80);
 	}
 }
 
@@ -201,7 +201,7 @@ void renderBG(int bg)
 	if (D_00EE == 1) {
 		if (D_00EA < 2) {
 			/* Fill outdoor sky with Cyan (0x55 = color index 1) */
-			memset(D_0337, 0x55, 80 * 80);
+			memset(cga_buffer, 0x55, 80 * 80);
 		} else {
 			BB_clear();
 		}
@@ -214,37 +214,37 @@ void renderBG(int bg)
 		/* Outdoor rendering */
 		if (D_00E4 != D_B9BA) {
 			/* Fill sky */
-			memset(D_0337, 0x55, 80 * 80);
+			memset(cga_buffer, 0x55, 80 * 80);
 			/* Copy Fuji background mountain graphics */
-			memcpy(&D_0337[80 * 80], &D_A606[1500], 34 * 80);
+			memcpy(&cga_buffer[80 * 80], &D_A606[1500], 34 * 80);
 			/* Draw white snow line */
-			memset(&D_0337[106 * 80], 0xFF, 1 * 80);
-			memset(&D_0337[107 * 80], 0x00, 3 * 80);
+			memset(&cga_buffer[106 * 80], 0xFF, 1 * 80);
+			memset(&cga_buffer[107 * 80], 0x00, 3 * 80);
 		}
 		C_0E39();
 		
 		/* Draw dithered floor pattern based on scroll phase */
 		unsigned char floor_pattern = (D_00E4 & 1) ? 0x66 : 0x99;
-		memset(&D_0337[150 * 80], floor_pattern, 15 * 80);
-		memset(&D_0337[165 * 80], ~floor_pattern, 15 * 80);
+		memset(&cga_buffer[150 * 80], floor_pattern, 15 * 80);
+		memset(&cga_buffer[165 * 80], ~floor_pattern, 15 * 80);
 	} else {
 		/* Indoor palace rendering */
 		C_0E39();
 		if (D_00EA == 2) {
 			if (D_00E4 != D_B9BA) {
-				memset(&D_0337[80 * 80], 0x00, 30 * 80);
-				memcpy(&D_0337[80 * 80], &D_A606[1500], 22 * 80);
-				memset(&D_0337[90 * 80], 0x00, 1 * 80);
+				memset(&cga_buffer[80 * 80], 0x00, 30 * 80);
+				memcpy(&cga_buffer[80 * 80], &D_A606[1500], 22 * 80);
+				memset(&cga_buffer[90 * 80], 0x00, 1 * 80);
 			}
 			/* Draw dithered floor pattern */
-			memset(&D_0337[150 * 80], 0xAA, 15 * 80);
-			memset(&D_0337[165 * 80], 0x00, 15 * 80);
+			memset(&cga_buffer[150 * 80], 0xAA, 15 * 80);
+			memset(&cga_buffer[165 * 80], 0x00, 15 * 80);
 		} else {
 			if (D_00E4 != D_B9BA) {
-				memset(D_0337, 0x00, 114 * 80);
+				memset(cga_buffer, 0x00, 114 * 80);
 			}
-			memset(&D_0337[150 * 80], 0x55, 15 * 80);
-			memset(&D_0337[165 * 80], 0x00, 15 * 80);
+			memset(&cga_buffer[150 * 80], 0x55, 15 * 80);
+			memset(&cga_buffer[165 * 80], 0x00, 15 * 80);
 		}
 	}
 }
@@ -294,7 +294,7 @@ void render(void)
 int C_0F57(void)
 {
 	BB_clear();
-	memcpy(&D_0337[0x15E0], D_A606, 0x1040);
+	memcpy(&cga_buffer[0x15E0], D_A606, 0x1040);
 	BB_flip();
 	if (C_191C(0x12)) return 1;
 	putFig(0x5C, 40, 180);
@@ -814,7 +814,7 @@ void C_2366(void)
 /* Clears bottom 16 scanlines in backbuffer */
 void ClearBottom(void)
 {
-	memset(&D_0337[0x3980], 0, 1280);
+	memset(&cga_buffer[0x3980], 0, 1280);
 }
 
 static const unsigned char triangle_left[14] = {
@@ -840,8 +840,8 @@ static const unsigned char triangle_right[14] = {
 static void clear_8x8_at(int offset)
 {
 	for (int i = 0; i < 7; i++) {
-		D_0337[offset + i * 80] = 0;
-		D_0337[offset + i * 80 + 1] = 0;
+		cga_buffer[offset + i * 80] = 0;
+		cga_buffer[offset + i * 80 + 1] = 0;
 	}
 }
 
@@ -849,8 +849,8 @@ static void draw_triangle_left(int idx)
 {
 	int offset = 0x3C50 + (idx * 3 - 2);
 	for (int i = 0; i < 7; i++) {
-		D_0337[offset + i * 80] = triangle_left[i * 2];
-		D_0337[offset + i * 80 + 1] = triangle_left[i * 2 + 1];
+		cga_buffer[offset + i * 80] = triangle_left[i * 2];
+		cga_buffer[offset + i * 80 + 1] = triangle_left[i * 2 + 1];
 	}
 }
 
@@ -858,8 +858,8 @@ static void draw_triangle_right(int idx)
 {
 	int offset = 0x3CA0 - (idx * 3);
 	for (int i = 0; i < 7; i++) {
-		D_0337[offset + i * 80] = triangle_right[i * 2];
-		D_0337[offset + i * 80 + 1] = triangle_right[i * 2 + 1];
+		cga_buffer[offset + i * 80] = triangle_right[i * 2];
+		cga_buffer[offset + i * 80 + 1] = triangle_right[i * 2 + 1];
 	}
 }
 

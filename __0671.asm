@@ -10,7 +10,7 @@ EXTRN D_00E4:WORD
 EXTRN D_00EA:WORD
 EXTRN D_00EE:WORD
 EXTRN D_0168:WORD	;allows CTRL+V?
-EXTRN D_0337:BYTE
+EXTRN cga_buffer:BYTE
 
 EXTRN D_BB60:BYTE
 EXTRN D_DE85:WORD
@@ -271,12 +271,12 @@ C_075C:
 	NOT	AX
 	MOV	CL,D_42B5
 	ROR	AX,CL
-	AND	AL,D_0337[DI]
+	AND	AL,cga_buffer[DI]
 	MOV	CL,D_42B5
 	MOV	DH,0
 	ROR	DX,CL
 	OR	AL,DL
-	MOV	D_0337[DI],AL
+	MOV	cga_buffer[DI],AL
 C_0784:
 	ADD	DI,50h
 	DEC	D_42B8
@@ -342,19 +342,19 @@ C_0807:
 	NOT	AX
 	MOV	CL,D_42B5
 	ROR	AX,CL
-	AND	AX,WORD PTR D_0337[DI]
+	AND	AX,WORD PTR cga_buffer[DI]
 	MOV	CL,D_42B5
 	MOV	DH,0
 	ROR	DX,CL
 	OR	AX,DX
-	MOV	WORD PTR D_0337[DI],AX
+	MOV	WORD PTR cga_buffer[DI],AX
 
 	JMP	SHORT C_0844
 C_0838:
 	XOR	AL,0FFh
-	AND	AL,D_0337[DI]
+	AND	AL,cga_buffer[DI]
 	OR	AL,DL
-	MOV	D_0337[DI],AL
+	MOV	cga_buffer[DI],AL
 C_0844:
 	ADD	DI,50h
 	DEC	D_42B8
@@ -385,12 +385,12 @@ C_0870:
 	NOT	AX
 	MOV	CL,D_42B5
 	ROR	AX,CL
-	AND	AH,D_0337[DI]
+	AND	AH,cga_buffer[DI]
 	MOV	CL,D_42B5
 	MOV	DH,0
 	ROR	DX,CL
 	OR	AH,DH
-	MOV	D_0337[DI],AH
+	MOV	cga_buffer[DI],AH
 C_089A:
 	ADD	DI,50h
 	DEC	D_42B8
@@ -505,12 +505,12 @@ C_097A:	;-- fig < 200 --
 	NOT	AX
 	MOV	CL,D_42B5
 	ROR	AX,CL
-	AND	AH,D_0337[DI]
+	AND	AH,cga_buffer[DI]
 	MOV	CL,D_42B5
 	MOV	DH,0
 	ROR	DX,CL
 	OR	AH,DH
-	MOV	D_0337[DI],AH
+	MOV	cga_buffer[DI],AH
 C_099F:
 	ADD	DI,50h
 	DEC	D_42B8
@@ -588,19 +588,19 @@ C_0A3C:
 	NOT	AX
 	MOV	CL,D_42B5
 	ROR	AX,CL
-	AND	AX,WORD PTR D_0337[DI]
+	AND	AX,WORD PTR cga_buffer[DI]
 	MOV	CL,D_42B5
 	MOV	DH,0
 	ROR	DX,CL
 	OR	AX,DX	;==rleDataByte
-	MOV	WORD PTR D_0337[DI],AX
+	MOV	WORD PTR cga_buffer[DI],AX
 
 	JMP	SHORT C_0A74
 C_0A68:
 	NOT	AL
-	AND	AL,D_0337[DI]
+	AND	AL,cga_buffer[DI]
 	OR	AL,DL	;==rleDataByte
-	MOV	D_0337[DI],AL
+	MOV	cga_buffer[DI],AL
 C_0A74:
 	ADD	DI,50h
 	DEC	BL
@@ -630,12 +630,12 @@ C_0AA4:	;-- fig < 200 --
 	NOT	AX
 	MOV	CL,D_42B5
 	ROR	AX,CL
-	AND	AL,D_0337[DI]
+	AND	AL,cga_buffer[DI]
 	MOV	CL,D_42B5
 	MOV	DH,0
 	ROR	DX,CL
 	OR	AL,DL
-	MOV	D_0337[DI],AL
+	MOV	cga_buffer[DI],AL
 C_0AC9:
 	ADD	DI,50h
 	DEC	D_42B8
@@ -652,12 +652,12 @@ C_0AD8:
 	INC	SI
 	MOV	CL,D_42B5
 	ROR	AX,CL
-	AND	AH,D_0337[DI]
+	AND	AH,cga_buffer[DI]
 	MOV	CL,D_42B5
 	MOV	DH,0
 	ROR	DX,CL
 	OR	AH,DH
-	MOV	D_0337[DI],AH
+	MOV	cga_buffer[DI],AH
 
 	ADD	DI,50h
 	DEC	D_42B8
@@ -677,7 +677,7 @@ C_0B17:
 C_0B21:
 	MOV	DL,ks_data[SI]
 	INC	SI
-	MOV	D_0337[DI],DL
+	MOV	cga_buffer[DI],DL
 	ADD	DI,50h
 	DEC	D_42B8
 	JNZ	C_0B21
@@ -695,12 +695,12 @@ C_0B50:
 	MOV	DL,ks_data[SI]
 	INC	SI
 	MOV	AX,D_42C2[BX]
-	AND	AX,WORD PTR D_0337[DI]
+	AND	AX,WORD PTR cga_buffer[DI]
 	MOV	CL,D_42B5
 	XOR	DH,DH
 	ROR	DX,CL
 	OR	AX,DX
-	MOV	WORD PTR D_0337[DI],AX
+	MOV	WORD PTR cga_buffer[DI],AX
 	ADD	DI,50h
 	DEC	D_42B8
 	JNZ	C_0B50
@@ -719,12 +719,12 @@ C_0B8B:
 	MOV	AX,0FF00h
 	MOV	CL,D_42B5
 	ROR	AX,CL
-	AND	AL,D_0337[DI]
+	AND	AL,cga_buffer[DI]
 	MOV	CL,D_42B5
 	MOV	DH,0
 	ROR	DX,CL
 	OR	AL,DL
-	MOV	D_0337[DI],AL
+	MOV	cga_buffer[DI],AL
 	ADD	DI,50h
 	DEC	D_42B8
 	JNZ	C_0B8B
@@ -736,7 +736,7 @@ BB_clear:
 	;--
 	PUSH	DS
 	POP	ES
-	LEA	DI,[D_0337]
+	LEA	DI,[cga_buffer]
 	XOR	AX,AX
 	MOV	CX,1F40h
 	REPZ	STOSW
@@ -884,7 +884,7 @@ renderBG:
 	;--
 	MOV	CX,0C80h
 	MOV	AX,5555h
-	LEA	DI,[D_0337]
+	LEA	DI,[cga_buffer]
 	REPZ	STOSW
 
 	JMP	C_0CE8	;(+nop)
@@ -904,15 +904,15 @@ C_0CE8:	;-- --
 	;-- render wall? --
 	MOV	CX,0F00h
 	MOV	AX,5555h
-	LEA	DI,D_0337[0A00h]
+	LEA	DI,cga_buffer[0A00h]
 	REPZ	STOSW
 
 	MOV	CX,550h
 	LEA	SI,[D_A606 + 1500]	;ABE2
-	LEA	DI,D_0337[1900h]
+	LEA	DI,cga_buffer[1900h]
 	REPZ	MOVSW
 
-	LEA	DI,D_0337[2120h]	;2457
+	LEA	DI,cga_buffer[2120h]	;2457
 	MOV	AX,0FFFFh
 	MOV	CX,28h
 	REPZ	STOSW
@@ -922,7 +922,7 @@ C_0CE8:	;-- --
 C_0D24:	;-- --
 	CALL	C_0E39	;clear backbuffer:line 114~135 or 108~132
 	;-- render floor? --
-	LEA	DI,D_0337[3020h]	;3357
+	LEA	DI,cga_buffer[3020h]	;3357
 	MOV	BL,0Fh
 	MOV	DX,9999h
 	MOV	AX,D_00E4
@@ -953,22 +953,22 @@ C_0D4F:	;-- --
 	CMP	AX,D_B9BA
 	JZ	C_0D87
 
-	LEA	DI,D_0337[0A00h]
+	LEA	DI,cga_buffer[0A00h]
 	MOV	CX,0F00h
 	XOR	AX,AX
 	REPZ	STOSW
 
 	LEA	SI,[D_A606 + 1500]	;ABE2
-	LEA	DI,D_0337[1900h]
+	LEA	DI,cga_buffer[1900h]
 	MOV	CX,370h
 	REPZ	MOVSW
 
-	LEA	DI,D_0337[1C20h] ;1F57
+	LEA	DI,cga_buffer[1C20h] ;1F57
 	XOR	AX,AX
 	MOV	CX,50h
 	REPZ	STOSW
 C_0D87: ;-- --
-	LEA	DI,D_0337[3020h]	;3357
+	LEA	DI,cga_buffer[3020h]	;3357
 	MOV	BL,0Fh
 C_0D8D:
 	MOV	AX,0AAAAh
@@ -987,7 +987,7 @@ C_0DA2:	;-- --
 	CMP	AX,D_B9BA
 	JZ	C_0DB6
 
-	LEA	DI,[D_0337]
+	LEA	DI,[cga_buffer]
 	MOV	CX,11D0h
 	XOR	AX,AX
 	REPZ	STOSW
@@ -1000,7 +1000,7 @@ C_0DA2:	;-- --
 
 
 C_0DB6: ;-- --
-	LEA	DI,D_0337[3020h]	;3357
+	LEA	DI,cga_buffer[3020h]	;3357
 	MOV	BL,0Fh
 C_0DBC:
 	MOV	AX,5555h
@@ -1018,7 +1018,7 @@ C_0DBC:
 PUBLIC BB_flip
 BB_flip:
 	MOV	BX,0
-	LEA	SI,[D_0337]
+	LEA	SI,[cga_buffer]
 	PUSH	ES
 	MOV	AX,GR_SEG
 	MOV	ES,AX
@@ -1036,7 +1036,7 @@ C_0DDE:
 BB_flip_part:
 	;-- --
 	MOV	DL,168
-	LEA	SI,D_0337[0A00h]
+	LEA	SI,cga_buffer[0A00h]
 	MOV	BX,64
 	;-- --
 	MOV	AX,D_00E4
@@ -1044,7 +1044,7 @@ BB_flip_part:
 	JNZ	C_0E1E
 	;-- --
 	MOV	DL,84
-	LEA	SI,D_0337[2440h]	;2777
+	LEA	SI,cga_buffer[2440h]	;2777
 	MOV	BX,232
 	;--
 	CMP	D_00EA,2
@@ -1071,7 +1071,7 @@ C_0E27:
 ;----------------------------------------
 ;clear backbuffer:line 114~135 or 108~132
 C_0E39:
-	LEA	DI,D_0337[23A0h]	;26D7
+	LEA	DI,cga_buffer[23A0h]	;26D7
 	MOV	CX,690h
 	CMP	D_00EA,2
 	JL	C_0E4F
@@ -1095,7 +1095,7 @@ BB_flip_wipe:
 	MOV	ES,AX
 C_0E61:
 	;-- --
-	LEA	SI,[D_0337]
+	LEA	SI,[cga_buffer]
 	XOR	BP,BP
 	MOV	CX,100
 C_0E6A:
@@ -1116,7 +1116,7 @@ C_0E6A:
 	;-- --
 	CALL	wipe_delay
 	;-- --
-	LEA	SI,[D_0337]
+	LEA	SI,[cga_buffer]
 	XOR	BP,BP
 	MOV	CX,100
 C_0EA3:
@@ -1137,7 +1137,7 @@ C_0EA3:
 	;-- --
 	CALL	wipe_delay
 	;-- --
-	LEA	SI,[D_0337]
+	LEA	SI,[cga_buffer]
 	XOR	BP,BP
 	MOV	CX,100
 C_0EDC:
@@ -1158,7 +1158,7 @@ C_0EDC:
 	;-- --
 	CALL	wipe_delay
 	;-- --
-	LEA	SI,[D_0337]
+	LEA	SI,[cga_buffer]
 	XOR	BP,BP
 	MOV	CX,100
 C_0F15:
@@ -1205,7 +1205,7 @@ C_0F57:
 	POP	ES
 	MOV	CX,820h
 	LEA	SI,[D_A606]
-	LEA	DI,D_0337[15E0h]
+	LEA	DI,cga_buffer[15E0h]
 	REPZ	MOVSW
 	;-- --
 	CALL	BB_flip

@@ -38,7 +38,7 @@ void C_19E9(void); /* Build script offset arrays */
 void C_2366(void); /* tick animation sequencer */
 
 /* Meters (from C_30A1.ASM) */
-void ClearBottom(void); /* Clears bottom 16 scanlines of D_0337 */
+void ClearBottom(void); /* Clears bottom 16 scanlines of cga_buffer */
 void DrMeters(void); /* Life bars */
 
 #endif /* ASSEMBLY_REPLACEMENTS_H */

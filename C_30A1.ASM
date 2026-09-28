@@ -12,7 +12,7 @@ EXTRN k_StrL:WORD	;0116
 EXTRN D_0118:WORD
 EXTRN D_011A:WORD
 EXTRN D_0170:WORD
-EXTRN D_0337:BYTE
+EXTRN cga_buffer:BYTE
 
 DGROUP	GROUP DATA
 ;########################################
@@ -109,7 +109,7 @@ __30F7:
 	SHL	AX,1
 	ADD	AX,BX
 	SUB	AX,2
-	LEA	DI,D_0337[3C50h]
+	LEA	DI,cga_buffer[3C50h]
 	ADD	DI,AX
 	CALL	C_31DF	;clear 8x8 @ DI
 
@@ -133,7 +133,7 @@ C_311B:
 	MOV	AX,BX
 	SHL	AX,1
 	ADD	AX,BX
-	LEA	DI,D_0337[3CA0h]
+	LEA	DI,cga_buffer[3CA0h]
 	SUB	DI,AX
 	CALL	C_31DF	;clear 8x8 @ DI
 
@@ -183,9 +183,9 @@ C_3189:
 	CMP	k_StrL,2
 	JG	C_31A9
 	MOV	D_D500,1
-	LEA	DI,D_0337[3C51h]
+	LEA	DI,cga_buffer[3C51h]
 	CALL	C_31DF	;clear 8x8 @ DI
-	LEA	DI,D_0337[3C54h]
+	LEA	DI,cga_buffer[3C54h]
 	CALL	C_31DF	;clear 8x8 @ DI
 	MOV	D_D4E2,0
 C_31A9:
@@ -199,9 +199,9 @@ C_31B6:
 	CMP	k_StrR,2
 	JG	C_31D6
 	MOV	D_D501,1
-	LEA	DI,D_0337[3C9Dh]
+	LEA	DI,cga_buffer[3C9Dh]
 	CALL	C_31DF	;clear 8x8 @ DI
-	LEA	DI,D_0337[3C9Ah]
+	LEA	DI,cga_buffer[3C9Ah]
 	CALL	C_31DF	;clear 8x8 @ DI
 	MOV	D_D4E0,0
 C_31D6:
@@ -225,7 +225,7 @@ C_31E2:
 ;----------------------------------------31EC
 PUBLIC ClearBottom
 ClearBottom:
-	LEA	DI,D_0337[3980h]
+	LEA	DI,cga_buffer[3980h]
 	XOR	AX,AX
 	MOV	CX,280h
 	REPZ	STOSW
@@ -250,7 +250,7 @@ C_3208:
 	SHL	AX,1
 	ADD	AX,BX
 	SUB	AX,2
-	LEA	DI,D_0337[3C50h]
+	LEA	DI,cga_buffer[3C50h]
 	ADD	DI,AX
 	LEA	SI,[D_D4E4]
 	CALL	C_31F8	;put 1 triangle(DI)
@@ -263,7 +263,7 @@ C_321F:
 	SHL	AX,1
 	ADD	AX,BX
 	;
-	LEA	DI,D_0337[3CA0h]
+	LEA	DI,cga_buffer[3CA0h]
 	SUB	DI,AX
 	LEA	SI,[D_D4F2]
 	CALL	C_31F8	;put 1 triangle(DI)
