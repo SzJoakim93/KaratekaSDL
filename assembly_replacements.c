@@ -93,8 +93,8 @@ void putFig(int fig, int x, int y)
 	figMaskIndex = mask_offset + 3;
 
 	for (int col = 0; col < fig_stride; col++) {
-	for (int row = 0; row < fig_height; row++) {
-		int py = y + row;
+		for (int row = 0; row < fig_height; row++) {
+			int py = y + row;
 			unsigned char m, d;
 			if (fig < 200) {
 				m = get_rle_mask_byte();
@@ -137,8 +137,8 @@ void putFig_flipx(int fig, int x, int y)
 	figMaskIndex = mask_offset + 3;
 
 	for (int col = 0; col < fig_stride; col++) {
-	for (int row = 0; row < fig_height; row++) {
-		int py = y + row;
+		for (int row = 0; row < fig_height; row++) {
+			int py = y + row;
 			unsigned char m, d;
 			if (fig < 200) {
 				m = get_rle_mask_byte();
@@ -282,6 +282,8 @@ void render(void)
 	if (D_B9C0[0] != 0) {
 		sound(D_B9C0[0]);
 	}
+
+	D_B9BA = D_00E4;
 }
 
 /* Draws intro title screen */
@@ -629,8 +631,8 @@ static void C_2341(RenderEntry *dst, char *src, int offset)
 {
 	memcpy(&dst[0], src + 1, 4);
 	memcpy(&dst[1], src + 6, 4);
-	dst[0].f_01 += offset;
-	dst[1].f_01 += offset;
+	dst[0].x_pos += offset;
+	dst[1].x_pos += offset;
 }
 
 /* Tick scripting and animation engine */
@@ -670,11 +672,11 @@ void C_2366(void)
 			char dx = D_C2B8[si + 4];
 			D_BB65 += dx;
 			player_x = D_BB65;
-			if (player_x > D_0102) {
+			if (player_x < D_0102) {
 				D_BB65 = D_0102;
 				player_x = D_0102;
 			}
-			if (player_x < D_0104) {
+			if (player_x > D_0104) {
 				D_BB65 = D_0104;
 				player_x = D_0104;
 			}
@@ -698,17 +700,16 @@ void C_2366(void)
 		int cam_x;
 		if (D_011A != 0) {
 			cam_x = D_010E - 170;
-			D_00E4 = cam_x;
 		} else {
 			cam_x = D_BB65 - 150;
-			D_00E4 = cam_x;
 		}
-		if (cam_x > D_0108) {
-			D_00E4 = D_0108;
+		if (cam_x < D_0108) {
+			cam_x = D_0108;
 		}
-		if (cam_x < D_010A) {
-			D_00E4 = D_010A;
+		if (cam_x > D_010A) {
+			cam_x = D_010A;
 		}
+		D_00E4 = cam_x;
 
 		if (D_011A == 0) {
 			D_B9C0[0] = D_C2B8[si + 6];
@@ -736,7 +737,7 @@ void C_2366(void)
 			char dx = D_CCCE[si + 4];
 			D_010E += dx;
 			if (D_012E == 0 && D_00F0 == 0 && D_D43A == 0) {
-				if (D_010E < D_0104) {
+				if (D_010E > D_0104) {
 					D_010E = D_0104;
 				}
 			}
@@ -766,7 +767,7 @@ void C_2366(void)
 		}
 
 		RenderEntry *e1 = (RenderEntry*)&D_B9C0[3 + current_offset];
-		e1->f_00 = D_CCCE[si + 8];
+		e1->fig_id = D_CCCE[si + 8];
 		int val_x = D_CCCE[si + 9] | (D_CCCE[si + 10] << 8);
 		if (D_00F2 != 0) val_x += 4;
 		if (D_D43A != 0) val_x += 12;
@@ -774,23 +775,23 @@ void C_2366(void)
 		if (D_00F2 == 0 && D_D43A == 0) {
 			val_x |= 0x4000;
 		}
-		e1->f_01 = val_x;
-		unsigned char val_f03 = D_CCCE[si + 11];
-		if (D_D43A != 0) val_f03 += D_D43C;
-		e1->f_03 = val_f03;
+		e1->x_pos = val_x;
+		unsigned char val_y = D_CCCE[si + 11];
+		if (D_D43A != 0) val_y += D_D43C;
+		e1->y_pos = val_y;
 
 		RenderEntry *e2 = (RenderEntry*)&D_B9C0[3 + current_offset + 4];
 		unsigned char f00_2 = D_CCCE[si + 13];
 		if (D_D43A == 0) {
 			f00_2 += D_0158;
 		}
-		e2->f_00 = f00_2;
+		e2->fig_id = f00_2;
 		int val_x2 = D_CCCE[si + 14] | (D_CCCE[si + 15] << 8);
 		if (D_00F2 != 0) val_x2 += 4;
 		if (D_D43A != 0) val_x2 += 12;
 		val_x2 += D_010E;
-		e2->f_01 = val_x2;
-		e2->f_03 = D_CCCE[si + 16];
+		e2->x_pos = val_x2;
+		e2->y_pos = D_CCCE[si + 16];
 
 		current_offset += 8;
 		D_CC78 += 0x11;
