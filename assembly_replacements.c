@@ -23,19 +23,10 @@ static int fig_height = 0;
 static int fig_width = 0;
 static int v_offset = 0;
 
-/* Helper to reverse bits in a byte for horizontal mirroring */
-static unsigned char reverse_bits(unsigned char b)
+/* Helper to reverse 2bpp pixels in a byte for horizontal mirroring */
+static unsigned char reverse_2bpp(unsigned char b)
 {
-	unsigned char r = 0;
-	if (b & 0x01) r |= 0x80;
-	if (b & 0x02) r |= 0x40;
-	if (b & 0x04) r |= 0x20;
-	if (b & 0x08) r |= 0x10;
-	if (b & 0x10) r |= 0x08;
-	if (b & 0x20) r |= 0x04;
-	if (b & 0x40) r |= 0x02;
-	if (b & 0x80) r |= 0x01;
-	return r;
+	return ((b & 0x03) << 6) | ((b & 0x0C) << 2) | ((b & 0x30) >> 2) | ((b & 0xC0) >> 6);
 }
 
 /* Helper to read next RLE data byte */
@@ -48,7 +39,7 @@ static unsigned char get_rle_data_byte(void)
 	unsigned char b = ks_data[figDataIndex++];
 	if (b == 0x7B) {
 		rleDataByte = ks_data[figDataIndex++];
-		rleDataCount = ks_data[figDataIndex++] - 1;
+		rleDataCount = ks_data[figDataIndex++];
 		return rleDataByte;
 	}
 	return b;
@@ -64,7 +55,7 @@ static unsigned char get_rle_mask_byte(void)
 	unsigned char b = km_data[figMaskIndex++];
 	if (b == 0x7B) {
 		rleMaskByte = km_data[figMaskIndex++];
-		rleMaskCount = km_data[figMaskIndex++] - 1;
+		rleMaskCount = km_data[figMaskIndex++];
 		return rleMaskByte;
 	}
 	return b;
@@ -83,15 +74,7 @@ static void write_pixel(int px, int py, unsigned char color_val)
 	cga_buffer[byte_idx] |= (color_val & 0x03) << pixel_shift;
 }
 
-/* Pseudo-random number generator mapping to original Prime LCG */
-int k_rand(int range)
-{
-	int r = C_414A();
-	r = (r * 2) & 0xFFFF;
-	return (int)(((unsigned long)(range + 1) * r) >> 16);
-}
-
-/* Blits standard sprite to backbuffer */
+/* Blits standard sprite to backbuffer (Column-major) */
 void putFig(int fig, int x, int y)
 {
 	unsigned short data_offset = (unsigned char)ks_index[fig * 2] | ((unsigned char)ks_index[fig * 2 + 1] << 8);
@@ -109,20 +92,20 @@ void putFig(int fig, int x, int y)
 	figDataIndex = data_offset + 3;
 	figMaskIndex = mask_offset + 3;
 
+	for (int col = 0; col < fig_stride; col++) {
 	for (int row = 0; row < fig_height; row++) {
 		int py = y + row;
-		for (int b = 0; b < fig_stride; b++) {
 			unsigned char m, d;
 			if (fig < 200) {
 				m = get_rle_mask_byte();
 				d = get_rle_data_byte();
 			} else {
-				m = km_data[figMaskIndex++];
+				m = 0xFF;
 				d = ks_data[figDataIndex++];
 			}
 
 			for (int p = 0; p < 4; p++) {
-				int px = x + b * 4 + p;
+				int px = x + col * 4 + p;
 				int shift = 6 - 2 * p;
 				unsigned char mask_val = (m >> shift) & 0x03;
 				unsigned char data_val = (d >> shift) & 0x03;
@@ -135,7 +118,7 @@ void putFig(int fig, int x, int y)
 	}
 }
 
-/* Blits horizontally mirrored sprite to backbuffer */
+/* Blits horizontally mirrored sprite to backbuffer (Column-major) */
 void putFig_flipx(int fig, int x, int y)
 {
 	unsigned short data_offset = (unsigned char)ks_index[fig * 2] | ((unsigned char)ks_index[fig * 2 + 1] << 8);
@@ -153,24 +136,23 @@ void putFig_flipx(int fig, int x, int y)
 	figDataIndex = data_offset + 3;
 	figMaskIndex = mask_offset + 3;
 
+	for (int col = 0; col < fig_stride; col++) {
 	for (int row = 0; row < fig_height; row++) {
 		int py = y + row;
-		for (int b = 0; b < fig_stride; b++) {
 			unsigned char m, d;
 			if (fig < 200) {
 				m = get_rle_mask_byte();
 				d = get_rle_data_byte();
 			} else {
-				m = km_data[figMaskIndex++];
+				m = 0xFF;
 				d = ks_data[figDataIndex++];
 			}
 
-			/* Mirror both mask and pixel layout inside the byte */
-			m = reverse_bits(m);
-			d = reverse_bits(d);
+			m = reverse_2bpp(m);
+			d = reverse_2bpp(d);
 
 			for (int p = 0; p < 4; p++) {
-				int px = x + (fig_stride - 1 - b) * 4 + p;
+				int px = x + (fig_stride - 1 - col) * 4 + p;
 				int shift = 6 - 2 * p;
 				unsigned char mask_val = (m >> shift) & 0x03;
 				unsigned char data_val = (d >> shift) & 0x03;
@@ -181,6 +163,14 @@ void putFig_flipx(int fig, int x, int y)
 			}
 		}
 	}
+}
+
+/* Pseudo-random number generator mapping to original Prime LCG */
+int k_rand(int range)
+{
+	int r = C_414A();
+	r = (r * 2) & 0xFFFF;
+	return (int)(((unsigned long)(range + 1) * r) >> 16);
 }
 
 /* Helper to clear ground scanlines */
@@ -225,8 +215,12 @@ void renderBG(int bg)
 		
 		/* Draw dithered floor pattern based on scroll phase */
 		unsigned char floor_pattern = (D_00E4 & 1) ? 0x66 : 0x99;
-		memset(&cga_buffer[150 * 80], floor_pattern, 15 * 80);
-		memset(&cga_buffer[165 * 80], ~floor_pattern, 15 * 80);
+		for (int row = 154; row < 184; row++) {
+			memset(&cga_buffer[row * 80], floor_pattern, 80);
+			floor_pattern = ~floor_pattern;
+		}
+		//memset(&cga_buffer[150 * 80], floor_pattern, 80);
+		//memset(&cga_buffer[165 * 80], floor_pattern, 15 * 80);
 	} else {
 		/* Indoor palace rendering */
 		C_0E39();
@@ -259,10 +253,10 @@ void render(void)
 	/* 2. Render Actors */
 	RenderEntry *entries = (RenderEntry*)&D_B9C0[3];
 	int idx = 0;
-	while (entries[idx].f_00 != 0xFF) {
-		int fig = entries[idx].f_00;
-		int x = entries[idx].f_01;
-		int y = entries[idx].f_03;
+	while (entries[idx].fig_id != 0xFF) {
+		int fig = entries[idx].fig_id;
+		int x = entries[idx].x_pos;
+		int y = entries[idx].y_pos;
 
 		if (x & 0x4000) {
 			x &= ~0x4000;

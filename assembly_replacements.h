@@ -5,12 +5,13 @@
 #ifndef ASSEMBLY_REPLACEMENTS_H
 #define ASSEMBLY_REPLACEMENTS_H
 
-/* Render structures */
+#pragma pack(push, 1)
 typedef struct {
-	unsigned char f_00;   /* Figure ID / state */
-	unsigned short f_01;  /* X coordinate (2 bytes) */
-	unsigned char f_03;   /* Frame index / Y coordinate */
+	unsigned char fig_id;  /* Figure/sprite ID */
+	unsigned short x_pos;  /* 16-bit X world coordinate */
+	unsigned char y_pos;   /* Y screen coordinate */
 } RenderEntry;
+#pragma pack(pop)
 
 /* Drawing & Blitting (from __0671.asm) */
 int k_rand(int range);
