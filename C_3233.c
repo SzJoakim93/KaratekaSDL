@@ -55,9 +55,9 @@ C_3233()
 		return 0;
 	}
 	/*-- --*/
-	if(D_010C == 0x46 && D_DE68 == 0x20) {
+	if(D_010C == 0x46 && pressedKey == 0x20) {
 		D_C262 = D_C264[0x10];
-		D_DE69 = 0;
+		isKeyPending = 0;
 	}
 	if(D_00EA == 2) {/*else 33E2*/
 		bp04 = D_0106 - D_BB65;

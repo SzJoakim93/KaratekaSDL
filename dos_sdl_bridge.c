@@ -177,7 +177,7 @@ void delay_ms(int ms)
 }
 
 /* Key mappings converter */
-static int map_sdl_keycode(int sdl_key)
+static unsigned char map_sdl_keycode(int sdl_key)
 {
 	switch (sdl_key) {
 		case SDLK_SPACE:  return ' ';
@@ -210,28 +210,27 @@ int DoInput(int wait_for_key)
 			exit(0);
 		}
 		else if (event.type == SDL_KEYDOWN) {
-			int mapped = map_sdl_keycode(event.key.keysym.sym);
-			if (mapped > 0) {
-				D_DE68 = (char)mapped;
-				D_DE69 = 1;
-				return 0xFF; /* Key pending */
+			unsigned char mappedKey = map_sdl_keycode(event.key.keysym.sym);
+			if (mappedKey > 0) {
+				pressedKey = mappedKey;
+				isKeyPending = 1;
+				return 1;
 			}
 		}
 	}
 #endif
-	return 0;
+	return isKeyPending ? 1 : 0;
 }
 
-int GetKey(void)
+unsigned char GetKey(void)
 {
-	int key = D_DE68;
-	D_DE69 = 0;
-	return key;
+	isKeyPending = 0;
+	return pressedKey;
 }
 
 void WaitKey(void)
 {
-	while (!D_DE69) {
+	while (!isKeyPending) {
 		DoInput(1);
 		delay_ms(10);
 	}
@@ -239,7 +238,7 @@ void WaitKey(void)
 
 void WaitNoKey(void)
 {
-	D_DE69 = 0;
+	isKeyPending = 0;
 }
 
 /* Bypassed Joystick presence check */

@@ -181,7 +181,7 @@ int bp06;
 C_1D4E()
 {
 	int bp02;
-	int bp04;
+	unsigned char bp04;
 
 	if(D_016E > 0)
 		return -1;
@@ -191,8 +191,8 @@ C_1D4E()
 		if(bp02 != -1) {
 			bp02 = C_1FD3(bp02, bp04);
 			if(bp02 == -1) {
-				D_DE68 = bp04;
-				D_DE69 = 1;
+				pressedKey = bp04;
+				isKeyPending = 1;
 			}
 		}
 		if(bp02 != -1) {
@@ -208,7 +208,7 @@ C_1D4E()
 
 C_1DD1()
 {
-	int bp02;
+	unsigned char bp02;
 
 	bp02 = 0;
 	if(D_DE72 == 1) {
@@ -309,7 +309,7 @@ C_1F86() {
 }
 
 C_1FD3(bp06)
-int bp06;
+unsigned char bp06;
 {
 	switch(D_010C) {
 		case 0x01:
@@ -365,7 +365,7 @@ C_20E3()
 			sound(0xb);
 		else
 			sound(0x14);
-		D_DE69 =
+		isKeyPending =
 		D_0174 =
 		D_016E = 0;
 	} else if(D_010C == 0x44) {

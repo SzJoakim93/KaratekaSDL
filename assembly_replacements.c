@@ -549,7 +549,7 @@ int C_177B(void)
 		/* Keyboard interrupt check (demo mode abort hook) */
 		if (D_0156 != 0) {
 			DoInput(0);
-			if (D_DE69 != 0) {
+			if (isKeyPending != 0) {
 				GetKey();
 				D_BB60 = 0;
 				return 1;
@@ -568,7 +568,7 @@ int C_191C(int ticks)
 	for (int i = 0; i < count; i++) {
 		C_1906(2);
 		DoInput(0);
-		if (D_DE69 != 0) {
+		if (isKeyPending != 0) {
 			return 1;
 		}
 	}

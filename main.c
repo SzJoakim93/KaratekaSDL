@@ -377,8 +377,8 @@ C_03DE()
 	/*-- --*/
 	D_010C = 0x41;
 	WaitNoKey();
-	D_DE69 = D_00EA = 0;
-	D_0174 = D_016C = D_016E = D_DE69;
+	isKeyPending = D_00EA = 0;
+	D_0174 = D_016C = D_016E = isKeyPending;
 	D_0156 = 0;
 }
 

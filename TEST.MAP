@@ -218,8 +218,8 @@
  06D6:DE2B       D_DE2B
  06D6:DE49       D_DE49
  06D6:DE66       D_DE66
- 06D6:DE68       D_DE68
- 06D6:DE69       D_DE69
+ 06D6:DE68       pressedKey
+ 06D6:DE69       isKeyPending
  06D6:DE70       D_DE70
  06D6:DE72       D_DE72
  06D6:DE85       D_DE85
@@ -665,8 +665,8 @@
  06D6:DE2B       D_DE2B
  06D6:DE49       D_DE49
  06D6:DE66       D_DE66
- 06D6:DE68       D_DE68
- 06D6:DE69       D_DE69
+ 06D6:DE68       pressedKey
+ 06D6:DE69       isKeyPending
  06D6:DE70       D_DE70
  06D6:DE72       D_DE72
  06D6:DE85       D_DE85

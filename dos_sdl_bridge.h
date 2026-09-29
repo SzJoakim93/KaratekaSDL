@@ -27,7 +27,7 @@ void delay_ms(int ms);
 
 /* Input Abstractions */
 int DoInput(int wait_for_key);
-int GetKey(void);
+unsigned char GetKey(void);
 void WaitKey(void);
 void WaitNoKey(void);
 int C_46CC(void); /* Joystick presence check: returns 0 (no joystick) */

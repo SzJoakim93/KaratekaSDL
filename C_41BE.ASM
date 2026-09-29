@@ -40,10 +40,10 @@ DGROUP	GROUP DATA
 ;########################################
 DATA	SEGMENT PUBLIC BYTE 'DATA'
 ;----------------------------------------
-PUBLIC D_DE68
-D_DE68	db 0
-PUBLIC D_DE69
-D_DE69	db 0
+PUBLIC pressedKey
+pressedKey	db 0
+PUBLIC isKeyPending
+isKeyPending	db 0
 D_DE6A	db "v i{i",0	;version string
 PUBLIC D_DE70
 D_DE70	dw 0
@@ -126,7 +126,7 @@ DoInput:
 	JZ	C_41DE
 	JMP	C_4287
 C_41DE:	;-- --
-	CMP	D_DE69,0
+	CMP	isKeyPending,0
 	JNZ	C_41E8
 	;--
 	CBW
@@ -220,8 +220,8 @@ C_427F:
 C_4285:
 	MOV	AL,'6'
 C_4287:
-	MOV	D_DE68,AL
-	MOV	D_DE69,1
+	MOV	pressedKey,AL
+	MOV	isKeyPending,1
 	;--
 	MOV	AL,0FFh
 	POP	BP
@@ -234,16 +234,16 @@ C_4293:	;-- pause:wait key? --
 PUBLIC GetKey
 GetKey:
 X_4299:
-	MOV	AL,D_DE68
+	MOV	AL,pressedKey
 	;-- --
-	CMP	D_DE69,0
+	CMP	isKeyPending,0
 	JNZ	C_42A7
 	MOV	AH,7	;direct console input without echo
 	INT	21h
 C_42A7:	;-- --
 	MOV	AH,0
 
-	MOV	D_DE69,0
+	MOV	isKeyPending,0
 	;-- is extended code ? --
 	CMP	AL,0
 	JZ	C_42B4
@@ -277,7 +277,7 @@ X_42D0:	;-- wait while key --
 	INT	21h
 	JNZ	X_42D0
 	;-- --
-	MOV	D_DE69,0
+	MOV	isKeyPending,0
 
 	RET
 ;----------------------------------------42DE

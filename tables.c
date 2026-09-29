@@ -71,8 +71,8 @@ const char D_E0CE[] = "";
    Single‑byte globals – default to zero.
    ------------------------------------------------------------------ */
 /* Global keyboard buffer variables defined in the ASM input module */
-unsigned char D_DE68 = 0; /* Last key pressed */
-unsigned char D_DE69 = 0; /* Key pending flag */
+unsigned char pressedKey = 0; /* Last key pressed */
+unsigned char isKeyPending = 0; /* Key pending flag */
 
 unsigned char D_BB60 = 0;
 unsigned char D_BB94[0x400] = {

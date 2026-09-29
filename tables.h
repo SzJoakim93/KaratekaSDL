@@ -37,8 +37,8 @@ extern const char D_DE49[];   /* " press q to quit| d for demo" */
 
 /* Single‑byte globals (initially zero) */
 /* Global keyboard buffer variables defined in the ASM input module */
-extern unsigned char D_DE68; /* Last key pressed */
-extern unsigned char D_DE69; /* Key pending flag */
+extern unsigned char pressedKey;
+extern unsigned char isKeyPending;
 
 extern unsigned char D_BB60;
 extern unsigned char D_BB94[0x400];
