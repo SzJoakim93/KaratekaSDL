@@ -85,7 +85,7 @@ void putFig(int fig, int x, int y)
 	fig_width = fig_stride * 4;
 
 	y -= fig_height;
-	x -= D_00E4;
+	x -= cameraClamp;
 
 	rleDataCount = 0;
 	rleMaskCount = 0;
@@ -129,7 +129,7 @@ void putFig_flipx(int fig, int x, int y)
 	fig_width = fig_stride * 4;
 
 	y -= fig_height;
-	x -= D_00E4;
+	x -= cameraClamp;
 
 	rleDataCount = 0;
 	rleMaskCount = 0;
@@ -202,7 +202,7 @@ void renderBG(int bg)
 
 	if (D_00EA < 2) {
 		/* Outdoor rendering */
-		if (D_00E4 != D_B9BA) {
+		if (cameraClamp != D_B9BA) {
 			/* Fill sky */
 			memset(cga_buffer, 0x55, 80 * 80);
 			/* Copy Fuji background mountain graphics */
@@ -214,7 +214,7 @@ void renderBG(int bg)
 		C_0E39();
 		
 		/* Draw dithered floor pattern based on scroll phase */
-		unsigned char floor_pattern = (D_00E4 & 1) ? 0x66 : 0x99;
+		unsigned char floor_pattern = (cameraClamp & 1) ? 0x66 : 0x99;
 		for (int row = 154; row < 184; row++) {
 			memset(&cga_buffer[row * 80], floor_pattern, 80);
 			floor_pattern = ~floor_pattern;
@@ -225,7 +225,7 @@ void renderBG(int bg)
 		/* Indoor palace rendering */
 		C_0E39();
 		if (D_00EA == 2) {
-			if (D_00E4 != D_B9BA) {
+			if (cameraClamp != D_B9BA) {
 				memset(&cga_buffer[80 * 80], 0x00, 30 * 80);
 				memcpy(&cga_buffer[80 * 80], &D_A606[1500], 22 * 80);
 				memset(&cga_buffer[90 * 80], 0x00, 1 * 80);
@@ -234,7 +234,7 @@ void renderBG(int bg)
 			memset(&cga_buffer[150 * 80], 0xAA, 15 * 80);
 			memset(&cga_buffer[165 * 80], 0x00, 15 * 80);
 		} else {
-			if (D_00E4 != D_B9BA) {
+			if (cameraClamp != D_B9BA) {
 				memset(cga_buffer, 0x00, 114 * 80);
 			}
 			memset(&cga_buffer[150 * 80], 0x55, 15 * 80);
@@ -283,7 +283,7 @@ void render(void)
 		sound(D_B9C0[0]);
 	}
 
-	D_B9BA = D_00E4;
+	D_B9BA = cameraClamp;
 }
 
 /* Draws intro title screen */
@@ -382,13 +382,13 @@ void C_44F4(int type, int offset)
 	unsigned short val_x;
 	unsigned char cl;
 	if (type == 0) {
-		val_x = D_BB65;
+		val_x = playerPosClamp;
 		cl = 0x61;
 		if (offset < 3) {
 			cl++;
 		}
 	} else {
-		val_x = D_010E;
+		val_x = enemyClamp;
 		cl = 0x63;
 		if (D_D43A == 0) {
 			bx = 14;
@@ -469,7 +469,7 @@ int C_177B(void)
 				unsigned short fx = D_BB94[script_idx + 2] | (D_BB94[script_idx + 3] << 8);
 				if (D_BB67 != 0) {
 					D_BB67--;
-					fx += D_BB65;
+					fx += playerPosClamp;
 				}
 				D_B9C0[di + 1] = fx & 0xFF;
 				D_B9C0[di + 2] = fx >> 8;
@@ -533,7 +533,7 @@ int C_177B(void)
 				script_idx += 3;
 				break;
 			case 0x16: /* SCRIPT_16/inc_x */
-				D_BB65 += (char)D_BB94[script_idx + 1];
+				playerPosClamp += (char)D_BB94[script_idx + 1];
 				script_idx += 2;
 				break;
 			case 0x18: /* SCRIPT_18/loop */
@@ -575,12 +575,12 @@ int C_191C(int ticks)
 void Cutscene(char* script_name, int idx)
 {
 	int prev_D_00EA = D_00EA;
-	int prev_D_00E4 = D_00E4;
+	int prev_cameraClamp = cameraClamp;
 
 	load_animation_script(script_name, D_BB94);
 	load_sprite_assets(idx);
 
-	D_00E4 = 0;
+	cameraClamp = 0;
 	BB_clear();
 	D_00EE = 1;
 	D_00EA = 4;
@@ -589,7 +589,7 @@ void Cutscene(char* script_name, int idx)
 
 	D_D4E2 = 0xFFFF;
 	D_00EA = prev_D_00EA;
-	D_00E4 = prev_D_00E4;
+	cameraClamp = prev_cameraClamp;
 }
 
 /* Parses text scripts and maps indexes offsets */
@@ -641,8 +641,8 @@ void C_2366(void)
 	D_B9C0[0] = 0;
 	D_B9C0[1] = 0;
 
-	D_BB65 = (D_BB65 + 3) & ~3;
-	D_010E = (D_010E + 3) & ~3;
+	playerPosClamp = (playerPosClamp + 3) & ~3;
+	enemyClamp = (enemyClamp + 3) & ~3;
 
 	int len = D_C232 - D_C230;
 	memcpy(&D_B9C0[3], (void*)D_C230, len);
@@ -667,18 +667,18 @@ void C_2366(void)
 		D_D43E = scale_flags >> 1;
 		D_00EC = scale_flags & 1;
 
-		int player_x = D_BB65;
+		int player_x = playerPosClamp;
 		if (D_011A == 0) {
 			char dx = D_C2B8[si + 4];
-			D_BB65 += dx;
-			player_x = D_BB65;
-			if (player_x < D_0102) {
-				D_BB65 = D_0102;
-				player_x = D_0102;
+			playerPosClamp += dx;
+			player_x = playerPosClamp;
+			if (player_x < min_boundary) {
+				playerPosClamp = min_boundary;
+				player_x = min_boundary;
 			}
-			if (player_x > D_0104) {
-				D_BB65 = D_0104;
-				player_x = D_0104;
+			if (player_x > max_boundary) {
+				playerPosClamp = max_boundary;
+				player_x = max_boundary;
 			}
 		}
 
@@ -686,36 +686,36 @@ void C_2366(void)
 			int cx_bound = player_x + 8;
 			if (D_D43A != 0) cx_bound -= 4;
 			if (D_010C == 0x0B) {
-				if (cx_bound - D_010E >= -0x10) {
+				if (cx_bound - enemyClamp >= -0x10) {
 					D_010C = 0;
 					D_C262 = D_C264[0];
 				}
 			}
-			if (cx_bound > D_010E) {
-				int over = cx_bound - D_010E;
-				D_BB65 -= over;
+			if (cx_bound > enemyClamp) {
+				int over = cx_bound - enemyClamp;
+				playerPosClamp -= over;
 			}
 		}
 
 		int cam_x;
 		if (D_011A != 0) {
-			cam_x = D_010E - 170;
+			cam_x = enemyClamp - 170;
 		} else {
-			cam_x = D_BB65 - 150;
+			cam_x = playerPosClamp - 150;
 		}
-		if (cam_x < D_0108) {
-			cam_x = D_0108;
+		if (cam_x < minCameraScroll) {
+			cam_x = minCameraScroll;
 		}
-		if (cam_x > D_010A) {
-			cam_x = D_010A;
+		if (cam_x > maxCameraScroll) {
+			cam_x = maxCameraScroll;
 		}
-		D_00E4 = cam_x;
+		cameraClamp = cam_x;
 
 		if (D_011A == 0) {
 			D_B9C0[0] = D_C2B8[si + 6];
 		}
 
-		C_2341((RenderEntry*)&D_B9C0[3 + current_offset], &D_C2B8[si + 7], D_BB65);
+		C_2341((RenderEntry*)&D_B9C0[3 + current_offset], &D_C2B8[si + 7], playerPosClamp);
 		current_offset += 8;
 		D_C262 += 0x11;
 	}
@@ -735,30 +735,30 @@ void C_2366(void)
 
 		if (D_0118 == 0) {
 			char dx = D_CCCE[si + 4];
-			D_010E += dx;
+			enemyClamp += dx;
 			if (D_012E == 0 && D_00F0 == 0 && D_D43A == 0) {
-				if (D_010E > D_0104) {
-					D_010E = D_0104;
+				if (enemyClamp > max_boundary) {
+					enemyClamp = max_boundary;
 				}
 			}
 		}
 
 		if (D_00FA <= 0) {
-			int player_boundary = D_BB65 + 8;
+			int player_boundary = playerPosClamp + 8;
 			if (D_D43A != 0) player_boundary -= 4;
 			if (D_0110 == 0x0A) {
-				if (D_010E - player_boundary <= 0x10) {
+				if (enemyClamp - player_boundary <= 0x10) {
 					D_0110 = 0;
 					D_CC78 = D_CC7A[0];
 				}
 			}
-			if (D_010E < player_boundary) {
-				D_010E = player_boundary;
+			if (enemyClamp < player_boundary) {
+				enemyClamp = player_boundary;
 			}
 		}
 
-		if (D_010E < D_0100) {
-			D_010E = D_0100;
+		if (enemyClamp < D_0100) {
+			enemyClamp = D_0100;
 		}
 
 		unsigned char snd = D_CCCE[si + 6];
@@ -771,7 +771,7 @@ void C_2366(void)
 		int val_x = D_CCCE[si + 9] | (D_CCCE[si + 10] << 8);
 		if (D_00F2 != 0) val_x += 4;
 		if (D_D43A != 0) val_x += 12;
-		val_x += D_010E;
+		val_x += enemyClamp;
 		if (D_00F2 == 0 && D_D43A == 0) {
 			val_x |= 0x4000;
 		}
@@ -789,7 +789,7 @@ void C_2366(void)
 		int val_x2 = D_CCCE[si + 14] | (D_CCCE[si + 15] << 8);
 		if (D_00F2 != 0) val_x2 += 4;
 		if (D_D43A != 0) val_x2 += 12;
-		val_x2 += D_010E;
+		val_x2 += enemyClamp;
 		e2->x_pos = val_x2;
 		e2->y_pos = D_CCCE[si + 16];
 

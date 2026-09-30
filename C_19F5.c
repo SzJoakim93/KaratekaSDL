@@ -101,18 +101,18 @@ int bp0a;
 	int bp04;
 
 	D_0158 = -1;
-	D_00E4 = 0;
+	cameraClamp = 0;
 	D_012E = 0;
 	if(bp0a == 2 || bp0a == 4)
 		D_012E = 1;
 	D_00EE = 1;
 	D_B9BA = -1;
-	D_BB65 = D_02E6[bp0a];
-	D_0102 = D_02F0[bp0a];
+	playerPosClamp = D_02E6[bp0a];
+	min_boundary = D_02F0[bp0a];
 	D_0106 =
-	D_0104 = D_02FA[bp0a];
-	D_0108 = D_0304[bp0a];
-	D_010A = D_030E[bp0a];
+	max_boundary = D_02FA[bp0a];
+	minCameraScroll = D_0304[bp0a];
+	maxCameraScroll = D_030E[bp0a];
 	D_0100 = D_0318[bp0a];
 	C_1C9F(bp0a);
 	if(bp0a == 3) {/*else 1C34*/
@@ -152,9 +152,9 @@ C_1C9F(bp06)
 int bp06;
 {
 	D_00E8 = 1;
-	D_010E = D_02DC[bp06];
+	enemyClamp = D_02DC[bp06];
 	if(bp06 == 3 && D_0130 > 1)
-		D_010E -= 320;
+		enemyClamp -= 320;
 	if(bp06 < 2) {
 		D_0110 = 0x41;
 		D_CC78 = D_CC7A[0x13];
@@ -264,7 +264,7 @@ int bp0a;
 	}/*end for*/
 	if(bp02 == 0xb)
 		return -1;
-	if(bp02 == 6 && D_BB65 == D_0102)
+	if(bp02 == 6 && playerPosClamp == min_boundary)
 		return -1;
 	if(D_010C > 0x3f) {
 		if(bp02 < 6)
@@ -375,7 +375,7 @@ C_20E3()
 	}
 	if(D_00FC == 1) {
 		D_00FC = 0;
-		D_BB65 -= 8;
+		playerPosClamp -= 8;
 		if(D_010C > 0x04 && D_010C < 0x08)
 			return 0x1b;
 

@@ -6,7 +6,7 @@
 ;========================================
 INCLUDE COMMON.MAC
 
-EXTRN D_00E4:WORD
+EXTRN cameraClamp:WORD
 EXTRN D_00EA:WORD
 EXTRN D_00EE:WORD
 
@@ -41,12 +41,12 @@ PUBLIC D_BB60
 D_BB60	db 0	;hide life bars
 D_BB61	dw 0	;timer related
 __BB63	dw 1000h
-PUBLIC D_BB65
-D_BB65	dw 0
+PUBLIC playerPosClamp
+playerPosClamp	dw 0
 D_BB67	db 0
 D_BB68	dw 0	;debug flag:"frame by frame"?
 D_BB6A	dw 0	;backup for D_00EA?
-D_BB6C	dw 0	;backup for D_00E4?
+D_BB6C	dw 0	;backup for cameraClamp?
 D_BB6E	dw 0	;backup for [bp+02]?
 D_BB70	dw 0	;backup for BP?
 D_BB72	dw 0	;timer related [for "SCRIPT_18/loop"]
@@ -223,7 +223,7 @@ C_17E7:
 	CMP	D_BB67,0
 	JZ	C_1806
 	DEC	D_BB67
-	ADD	AX,D_BB65
+	ADD	AX,playerPosClamp
 C_1806:
 	MOV	WORD PTR D_B9C0[DI].f_01,AX
 	MOV	AL,D_BB94[SI+4]
@@ -341,7 +341,7 @@ C_18EC:
 C_18F7:
 	MOV	AL,D_BB94[SI+1]
 	CBW	
-	ADD	D_BB65,AX
+	ADD	playerPosClamp,AX
 	ADD	D_BB76,2
 
 	RET	
@@ -407,7 +407,7 @@ Cutscene:
 	MOV	D_BB6E,AX
 	MOV	AX,D_00EA
 	MOV	D_BB6A,AX
-	MOV	AX,D_00E4
+	MOV	AX,cameraClamp
 	MOV	D_BB6C,AX
 	;-- --
 	LEA	AX,[D_BB94]
@@ -423,7 +423,7 @@ Cutscene:
 	ADD	SP,2
 	MOV	BP,D_BB70	;restore BP
 
-	MOV	D_00E4,0
+	MOV	cameraClamp,0
 	CALL	BB_clear
 	MOV	D_00EE,1
 	;-- --
@@ -435,7 +435,7 @@ Cutscene:
 	MOV	AX,D_BB6A
 	MOV	D_00EA,AX
 	MOV	AX,D_BB6C
-	MOV	D_00E4,AX
+	MOV	cameraClamp,AX
 	MOV	BX,D_BB6E
 	MOV	[BP+02],BX
 	;-- --

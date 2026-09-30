@@ -60,7 +60,7 @@ C_3233()
 		isKeyPending = 0;
 	}
 	if(D_00EA == 2) {/*else 33E2*/
-		bp04 = D_0106 - D_BB65;
+		bp04 = D_0106 - playerPosClamp;
 		if(D_D50C > 0) {
 			D_D50C --;
 		} else if(D_012C == 0) {
@@ -93,9 +93,9 @@ C_3233()
 			}
 		}
 		if(D_012C > 1 && bp04 > 0x20 && D_00F8 == 0)
-			D_0104 = D_0106 - 0x44;
+			max_boundary = D_0106 - 0x44;
 		else
-			D_0104 = D_0106;
+			max_boundary = D_0106;
 	}
 	if(D_00F8 > 0) {/*else 3452*/
 		if(D_0166 == 0) {
@@ -115,7 +115,7 @@ C_3233()
 
 		return 0;
 	}
-	if(D_BB65 == D_0104) {/*else 37C0*/
+	if(playerPosClamp == max_boundary) {/*else 37C0*/
 		if(D_0152 == 3) {
 			D_0152 = 0;
 			D_00EA = 2;
@@ -147,13 +147,13 @@ C_3233()
 				Cutscene(/*D520*/"cal04", 8);
 				load_level_assets(++D_00EA);
 				load_background_graphics(/*D517*/"fuji.bcg", 1500);
-				D_010E = 200;
+				enemyClamp = 200;
 				D_00E2 = 1;
 				D_0166 = 9;
 
 				return 0;
 			case 2:
-				if(D_0104 < D_0106) {
+				if(max_boundary < D_0106) {
 					C_3BEF();
 
 					return 0;
@@ -163,7 +163,7 @@ C_3233()
 				D_0130 = 1;
 				D_B9BA = -1;
 				load_level_assets(++D_00EA);
-				D_0102 = D_BB65;
+				min_boundary = playerPosClamp;
 				D_012E = 1;
 				D_00FA = 0;
 				D_D50E = 0;
@@ -181,8 +181,8 @@ C_3233()
 						C_19E9();/*make indexes for D_CCCE*/
 						D_0130 = 6;
 						C_3AC0(D_0130);
-						D_010E = 276;
-						D_BB65 = D_010E - 30;
+						enemyClamp = 276;
+						playerPosClamp = enemyClamp - 30;
 						D_0110 = 6;
 						D_00F2 = 1;
 						k_StrR = 26 - k_StrL;
@@ -202,8 +202,8 @@ C_3233()
 						return 0;
 					}
 					if(D_0130 == 2) {
-						D_0104 -= 0x140;
-						D_010A -= 0x140;
+						max_boundary -= 0x140;
+						maxCameraScroll -= 0x140;
 					}
 					D_012E = D_0142[D_0130];
 					if(D_00FA > 0) {/*else 36D2*/
@@ -217,12 +217,12 @@ C_3233()
 							D_D50E = 1;
 						}
 					} else {
-						D_010E -= 276;
+						enemyClamp -= 276;
 					}
 					if(D_012E == 0)
-						D_0104 = 0xfc;
+						max_boundary = 0xfc;
 					else
-						D_0104 = 0x130;
+						max_boundary = 0x130;
 					C_3AC0(D_0130);
 
 					return 0;
@@ -247,13 +247,13 @@ C_3233()
 				D_012E = D_0142[D_0130];
 				C_3AC0(D_0130);
 				if(D_0130 == 7) {/*else 37A1*/
-					D_0104 = 0xac;
+					max_boundary = 0xac;
 					load_animation_script(/*D539*/"cal03", D_BB94);
 					load_sprite_assets(0xb);/*load ks/km files*/
 					load_animation_script(/*D53F*/"prngal", D_CCCE);
 					C_19E9();/*make indexes for D_CCCE*/
 					D_00FA = 0;
-					D_010E = 200;
+					enemyClamp = 200;
 					D_0110 = 1;
 					D_00F0 = 1;
 					D_CC78 = D_CC7A[0];
@@ -269,12 +269,12 @@ C_3233()
 		D_0120 = 2;
 		D_0126 = 2;
 	}
-	if(D_00FA == 1 && (D_00EA == 1 || D_00EA == 2) && D_012C == 0 && D_0104 - D_BB65 > 0x3c) {/*else 3986*/
+	if(D_00FA == 1 && (D_00EA == 1 || D_00EA == 2) && D_012C == 0 && max_boundary - playerPosClamp > 0x3c) {/*else 3986*/
 		if(D_0166 == 0) {
 			D_0120 = 2;
 			D_0126 = 2;
 			D_0166 = 0x28;
-			if(D_0104 - D_BB65 < 0xfa)
+			if(max_boundary - playerPosClamp < 0xfa)
 				D_0166 = 0x3c;
 			if(D_00E2 == 1)
 				D_0166 = 0x32;
@@ -299,7 +299,7 @@ C_3233()
 
 				return 0;
 			}
-			if(D_0104 - D_BB65 > 0x190) {/*else 396A*/
+			if(max_boundary - playerPosClamp > 0x190) {/*else 396A*/
 				if(D_00EA == 2 && D_D506 == 0) {
 					D_D506 = 1;
 					sound(0x18);
@@ -307,15 +307,15 @@ C_3233()
 					k_StrR = 0;
 					D_011E = 0;
 					D_00FE = 0;
-					D_010E = D_BB65 + 296;
+					enemyClamp = playerPosClamp + 296;
 					D_0166 = 2;
 					/*goto 397f*/
 				} else {
 					C_1C9F(D_00EA);
 					D_D506 = 0;
 					if(D_00EA == 2) {/*else 395C*/
-						if(D_010E - D_BB65 > 320)
-							D_010E = D_BB65 + 300;
+						if(enemyClamp - playerPosClamp > 320)
+							enemyClamp = playerPosClamp + 300;
 					} else {
 						D_011A = 0x20;
 					}
@@ -323,17 +323,17 @@ C_3233()
 					/*goto 397f*/
 				}
 			} else {
-				if(D_0104 - D_BB65 > 0x1e)
+				if(max_boundary - playerPosClamp > 0x1e)
 					C_1C9F(D_00EA);
 			}
 		}
 
 		return 0;
 	}
-	if(D_BB65 == D_0102) {/*else 39F2*/
+	if(playerPosClamp == min_boundary) {/*else 39F2*/
 		if(D_00EA == 0) {
-			D_BB65 = 0x2c;
-			D_0102 = 0x28;
+			playerPosClamp = 0x2c;
+			min_boundary = 0x28;
 			D_C262 = D_C264[0x20];
 
 			return 0;
@@ -347,13 +347,13 @@ C_3233()
 					D_C236 = 2;
 					C_3B1D();
 				}
-				D_BB65 = 0x114;
-				D_0104 = D_BB65 + 2;
-				D_010E += 276;
+				playerPosClamp = 0x114;
+				max_boundary = playerPosClamp + 2;
+				enemyClamp += 276;
 			}
 		}
 	}
-	bp04 = D_010E - D_BB65;
+	bp04 = enemyClamp - playerPosClamp;
 	if(bp04 < 330) {
 		D_011A =
 		D_0118 = 0;
@@ -387,7 +387,7 @@ C_3233()
 			D_0118 = 0x20;
 			D_B9BA = -1;
 			if(bp04 > 800)
-				D_010E -= bp04 / 2;
+				enemyClamp -= bp04 / 2;
 		} else {
 			D_00FA = 1;
 			D_0158 --;
@@ -404,11 +404,11 @@ int bp06;
 	if(D_D502 == 1)
 		D_D502 ++;
 	if(bp06 == 2) {
-		D_0102 = 0x20;
-		D_BB65 = 0x20;
+		min_boundary = 0x20;
+		playerPosClamp = 0x20;
 	} else {
-		D_0102 = 0;
-		D_BB65 = 4;
+		min_boundary = 0;
+		playerPosClamp = 4;
 	}
 	D_C236 = 3;
 	if(bp06 == 7)
@@ -452,7 +452,7 @@ C_3BAC()
 C_3BEF()
 {
 	sound(1);
-	D_BB65 -= 4;
+	playerPosClamp -= 4;
 	if(--k_StrL == 0) {
 		D_00F8 = 1;
 		D_C262 = D_C264[0x1c];

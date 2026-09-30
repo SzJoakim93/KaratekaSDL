@@ -58,7 +58,7 @@ C_268A()
 		if(D_0118 > 0)
 			return 0;
 	}
-	bp06 = D_010E - D_BB65;
+	bp06 = enemyClamp - playerPosClamp;
 	if(D_0110 == 0x1c) {
 		D_016C = 1;
 		D_016E = 1;
@@ -101,7 +101,7 @@ C_268A()
 		if(D_0110 == 0x21)
 			return 0x20;
 		if(D_00EA == 3) {/*else 280E*/
-			if(D_010E > 300) {/*else 2806*/
+			if(enemyClamp > 300) {/*else 2806*/
 				if(D_00F8 > 0) {
 					D_D43A = 0;
 					D_00FA = 2;
@@ -112,9 +112,9 @@ C_268A()
 			}
 			return 0x20;
 		}
-		if(D_010E - D_BB65 < 250)
+		if(enemyClamp - playerPosClamp < 250)
 			return 0x20;
-		D_010E = 1920;
+		enemyClamp = 1920;
 		D_D43A = 0;
 		D_00FA = 1;
 		return 0;
@@ -128,7 +128,7 @@ C_268A()
 	}
 	if(D_00FE == 1) {
 		D_00FE = 0;
-		D_010E += 8;
+		enemyClamp += 8;
 		if(D_0110 > 4 && D_0110 < 8)
 			return 0x1b;
 		return 0;
@@ -181,9 +181,9 @@ int bp0a;
 		bp04 = (D_00F4 * 3) / 4;
 	if(k_rand(0xff) > bp04)
 		return 0;
-	if(D_00EA == 0 && D_010E < D_0102 + 15)
+	if(D_00EA == 0 && enemyClamp < min_boundary + 15)
 		return 0;
-	if(D_010E < D_0102 + 5)
+	if(enemyClamp < min_boundary + 5)
 		return 0;
 	if(D_0110 == 7 || D_0110 == 0xa)
 		if(bp0a > 0x1c)
@@ -217,7 +217,7 @@ C_2ACE()
 
 	if(D_00F8 == 1)
 		return 0x1e;
-	bp04 = D_010E - D_BB65;
+	bp04 = enemyClamp - playerPosClamp;
 	if(D_010C == 0x08) {
 		sound(0xb);
 		return 0xf;
@@ -232,7 +232,7 @@ C_2ACE()
 		return 0xf;
 	if(D_00FC == 1) {
 		D_00FC = 0;
-		D_BB65 -= 4;
+		playerPosClamp -= 4;
 		if(D_010C > 0x04 && D_010C < 0x08)
 			return 0x1b;
 		else
@@ -269,7 +269,7 @@ C_2C62()
 
 	if(D_00F8 > 0)
 		return 0;
-	bp04 = D_010E - D_BB65;
+	bp04 = enemyClamp - playerPosClamp;
 	if(D_00EC == 1) {/*else 2E35*/
 		if(D_D43A == 1) {/*else 2D0A*/
 			if(D_0110 == 0x1f && bp04 > 0x13 && bp04 < 0x1c) {/*else 2E35*/
@@ -286,7 +286,7 @@ C_2C62()
 			}
 		} else {
 			if(D_00FA > 0) {/*else 2D80*/
-				if(D_012E == 0 && D_BB65 > 0xec && D_00EA > 2) {
+				if(D_012E == 0 && playerPosClamp > 0xec && D_00EA > 2) {
 					if(D_010C < 0x05) {
 						D_0154 = 1;
 						/*goto 2e35*/
@@ -297,7 +297,7 @@ C_2C62()
 							C_3BAC();
 							k_StrR = 5;
 							D_0120 = D_0122;
-							D_010E = D_0104 + 16;
+							enemyClamp = max_boundary + 16;
 							D_C262 = D_C264[0xc];
 							/*goto 2e35*/
 						}
@@ -352,7 +352,7 @@ C_2C62()
 			if(D_0110 == 7)
 				bp04 -= 4;
 			bp06 = C_445D(D_0110 - 2, bp04, D_D43E);/*collision related?*/
-			if(bp06 == 4 && D_BB65 > D_0102)
+			if(bp06 == 4 && playerPosClamp > min_boundary)
 				D_C262 = D_C264[7];
 		}
 		if(D_0110 == 0x21 || bp06 == 2 || bp06 == 3 || D_010C > 0x3f) {/*else 2F64*/
@@ -393,7 +393,7 @@ C_2C62()
 
 C_2FB2()
 {
-	D_0104 += 0x14;
+	max_boundary += 0x14;
 	D_0142[D_0130] = 1;
 	D_012E = 1;
 	D_C232 = D_C246[++D_C236];

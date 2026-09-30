@@ -6,7 +6,7 @@
 ;========================================
 INCLUDE COMMON.MAC
 
-EXTRN D_00E4:WORD
+EXTRN cameraClamp:WORD
 EXTRN D_00EA:WORD
 EXTRN D_00EE:WORD
 EXTRN D_0168:WORD	;allows CTRL+V?
@@ -107,7 +107,7 @@ D_B6FA	dw 050h,064h,078h,08Ch,0A0h,0B4h,0CCh,0E4h
 	db 000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,0FEh,000h,000h
 ;-- --
 PUBLIC D_B9BA
-D_B9BA	dw 0	;prev D_00E4?
+D_B9BA	dw 0	;prev cameraClamp?
 __B9BC	db 0,0
 PUBLIC D_B9BE	;index in D_B9C0?
 D_B9BE	dw 0
@@ -213,7 +213,7 @@ putFig_flipx:
 	ADD	figMaskIndex,3
 
 	MOV	AX,[BP+06]	;x?
-	SUB	AX,D_00E4
+	SUB	AX,cameraClamp
 	MOV	[BP+06],AX	;x?
 	MOV	BX,AX
 	AND	AL,3
@@ -435,7 +435,7 @@ putFig:
 	ADD	figMaskIndex,3
 
 	MOV	AX,[BP+06]	;x?
-	SUB	AX,D_00E4
+	SUB	AX,cameraClamp
 	MOV	[BP+06],AX	;x?
 	JL	C_0903
 	JMP	C_09C0
@@ -898,7 +898,7 @@ C_0CE8:	;-- --
 	CMP	D_00EA,2
 	JGE	C_0D4F
 	;-- --
-	MOV	AX,D_00E4
+	MOV	AX,cameraClamp
 	CMP	AX,D_B9BA
 	JZ	C_0D24
 	;-- render wall? --
@@ -925,7 +925,7 @@ C_0D24:	;-- --
 	LEA	DI,cga_buffer[3020h]	;3357
 	MOV	BL,0Fh
 	MOV	DX,9999h
-	MOV	AX,D_00E4
+	MOV	AX,cameraClamp
 	AND	AX,1
 	JZ	C_0D3B
 	MOV	DX,6666h
@@ -949,7 +949,7 @@ C_0D4F:	;-- --
 	CMP	D_00EA,3
 	JGE	C_0DA2
 	;-- --
-	MOV	AX,D_00E4
+	MOV	AX,cameraClamp
 	CMP	AX,D_B9BA
 	JZ	C_0D87
 
@@ -983,7 +983,7 @@ C_0D8D:
 	POP	ES
 	RET	
 C_0DA2:	;-- --
-	MOV	AX,D_00E4
+	MOV	AX,cameraClamp
 	CMP	AX,D_B9BA
 	JZ	C_0DB6
 
@@ -1039,7 +1039,7 @@ BB_flip_part:
 	LEA	SI,cga_buffer[0A00h]
 	MOV	BX,64
 	;-- --
-	MOV	AX,D_00E4
+	MOV	AX,cameraClamp
 	CMP	AX,D_B9BA
 	JNZ	C_0E1E
 	;-- --

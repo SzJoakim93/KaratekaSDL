@@ -93,7 +93,7 @@
  0000:41BE       DOINPUT
  0000:30A1       DRMETERS
  06D6:00E2       D_00E2
- 06D6:00E4       D_00E4
+ 06D6:00E4       cameraClamp
  06D6:00E6       D_00E6
  06D6:00E8       D_00E8
  06D6:00EA       D_00EA
@@ -108,13 +108,13 @@
  06D6:00FC       D_00FC
  06D6:00FE       D_00FE
  06D6:0100       D_0100
- 06D6:0102       D_0102
- 06D6:0104       D_0104
+ 06D6:0102       min_boundary
+ 06D6:0104       max_boundary
  06D6:0106       D_0106
- 06D6:0108       D_0108
- 06D6:010A       D_010A
+ 06D6:0108       minCameraScroll
+ 06D6:010A       maxCameraScroll
  06D6:010C       D_010C
- 06D6:010E       D_010E
+ 06D6:010E       enemyClamp
  06D6:0110       D_0110
  06D6:0112       D_0112
  06D6:0118       D_0118
@@ -171,7 +171,7 @@
  06D6:B9BE       D_B9BE
  06D6:B9C0       D_B9C0
  06D6:BB60       D_BB60
- 06D6:BB65       D_BB65
+ 06D6:BB65       playerPosClamp
  06D6:BB92       D_BB92
  06D6:BB94       D_BB94
  06D6:BF92       D_BF92
@@ -530,7 +530,7 @@
  06D6:0080       _OSERR
  06D6:00E0       _STACK
  06D6:00E2       D_00E2
- 06D6:00E4       D_00E4
+ 06D6:00E4       cameraClamp
  06D6:00E6       D_00E6
  06D6:00E8       D_00E8
  06D6:00EA       D_00EA
@@ -545,13 +545,13 @@
  06D6:00FC       D_00FC
  06D6:00FE       D_00FE
  06D6:0100       D_0100
- 06D6:0102       D_0102
- 06D6:0104       D_0104
+ 06D6:0102       min_boundary
+ 06D6:0104       max_boundary
  06D6:0106       D_0106
- 06D6:0108       D_0108
- 06D6:010A       D_010A
+ 06D6:0108       minCameraScroll
+ 06D6:010A       maxCameraScroll
  06D6:010C       D_010C
- 06D6:010E       D_010E
+ 06D6:010E       enemyClamp
  06D6:0110       D_0110
  06D6:0112       D_0112
  06D6:0114       K_STRR
@@ -616,7 +616,7 @@
  06D6:B9BE       D_B9BE
  06D6:B9C0       D_B9C0
  06D6:BB60       D_BB60
- 06D6:BB65       D_BB65
+ 06D6:BB65       playerPosClamp
  06D6:BB92       D_BB92
  06D6:BB94       D_BB94
  06D6:BF92       D_BF92

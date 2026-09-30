@@ -9,7 +9,7 @@
 
 /*---- ----*/
 extern int D_00E2;
-extern int D_00E4;
+extern int cameraClamp;
 extern int D_00E6;
 extern int D_00E8;
 extern int D_00EA;
@@ -24,13 +24,13 @@ extern int D_00FA;
 extern int D_00FC;
 extern int D_00FE;
 extern int D_0100;
-extern int D_0102;
-extern int D_0104;
+extern int min_boundary;
+extern int max_boundary;
 extern int D_0106;
-extern int D_0108;
-extern int D_010A;
+extern int minCameraScroll;
+extern int maxCameraScroll;
 extern int D_010C;
-extern int D_010E;
+extern int enemyClamp;
 extern int D_0110;
 extern int D_0112;
 /*0114*/extern int k_StrR;

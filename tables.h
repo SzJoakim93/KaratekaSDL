@@ -42,7 +42,7 @@ extern unsigned char isKeyPending;
 
 extern unsigned char D_BB60;
 extern unsigned char D_BB94[0x400];
-extern unsigned char D_BB65;
+extern unsigned short playerPosClamp;
 extern unsigned char D_DE70;
 extern unsigned char D_DE72;
 /* New globals */

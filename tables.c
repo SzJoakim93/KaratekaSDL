@@ -84,7 +84,7 @@ unsigned char D_BB94[0x400] = {
    0x08,
    0xFF
 };
-unsigned char D_BB65 = 0;
+unsigned short playerPosClamp = 0;
 unsigned char D_DE70 = 0;
 unsigned char D_DE72 = 0;
 

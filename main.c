@@ -16,7 +16,7 @@ some alpha/beta versions can be found at:
 int _stack = 300;
 /*-- --*/
 int D_00E2 = 0;
-int D_00E4 = 0;
+int cameraClamp = 0;
 int D_00E6 = 0;
 int D_00E8 = 0;
 int D_00EA = 0;/*bg info?*/
@@ -31,13 +31,13 @@ int D_00FA = 0;
 int D_00FC = 0;
 int D_00FE = 0;
 int D_0100 = 0;
-int D_0102 = 0;
-int D_0104 = 0;
+int min_boundary = 0;
+int max_boundary = 0;
 int D_0106 = 0;
-int D_0108 = 0;
-int D_010A = 0;
+int minCameraScroll = 0;
+int maxCameraScroll = 0;
 int D_010C = 0;
-int D_010E = 0;
+int enemyClamp = 0;
 int D_0110 = 0;
 int D_0112 = 0;
 /*0114*/int k_StrR = 0;/*enemy life*/
@@ -314,7 +314,7 @@ C_03DE()
 			C_0616();/*little intro*/
 			break;
 		}
-		D_00E4 = 0;
+		cameraClamp = 0;
 		BB_clear();
 		D_00EE = 1;
 		D_00EA = 4;
@@ -387,7 +387,7 @@ C_05D2()
 {
 	if(
 		(D_00F8 == 1 && D_010C == 0x43) ||
-		D_BB65 == D_0104 ||
+		playerPosClamp == max_boundary ||
 		DoInput(1)
 	) return 1;
 
