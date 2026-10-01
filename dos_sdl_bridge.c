@@ -25,7 +25,7 @@ static const unsigned int cga_palette[4] = {
 
 #endif
 
-/* Initialize the SDL graphics subsystem, window and upscaled texture */
+/* Initialize the SDL graphics subsystem and window*/
 void init_sdl_graphics(void)
 {
 #ifdef USE_SDL
@@ -48,22 +48,6 @@ void init_sdl_graphics(void)
 		return;
 	}
 
-	texture = SDL_CreateRGBSurface(
-		0,
-		640,
-		400,
-		32,
-		0x00FF0000,
-		0x0000FF00,
-		0x000000FF,
-		0xFF000000
-	);
-
-	if (!texture) {
-		fprintf(stderr, "Texture could not be created: %s\n", SDL_GetError());
-		return;
-	}
-
 	SDL_FillRect(screen, NULL, 0);
 	SDL_Flip(screen);
 #endif
@@ -73,10 +57,7 @@ void init_sdl_graphics(void)
 void close_sdl_graphics(void)
 {
 #ifdef USE_SDL
-	if (texture) {
-		SDL_FreeSurface(texture);
-		texture = NULL;
-	}
+
 	if (screen) {
 		SDL_FreeSurface(screen);
 		screen = NULL;
@@ -96,10 +77,10 @@ void BB_flip(void)
 {
 #ifdef USE_SDL
 	int x, y;
-	if (!texture) return;
-	if (SDL_MUSTLOCK(texture)) SDL_LockSurface(texture);
+	if (!screen) return;
+	if (SDL_MUSTLOCK(screen)) SDL_LockSurface(screen);
 
-	Uint32 *pixels = (Uint32*)texture->pixels;
+	Uint32 *pixels = (Uint32*)screen->pixels;
 
 	for (y = 0; y < 200; y++) {
 		for (x = 0; x < 320; x++) {
@@ -119,9 +100,8 @@ void BB_flip(void)
 		}
 	}
 
-	if (SDL_MUSTLOCK(texture)) SDL_UnlockSurface(texture);
+	if (SDL_MUSTLOCK(screen)) SDL_UnlockSurface(screen);
 
-	SDL_BlitSurface(texture, NULL, screen, NULL);
 	SDL_Flip(screen);
 #endif
 }
