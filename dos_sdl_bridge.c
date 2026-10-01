@@ -13,7 +13,60 @@ extern char cga_buffer[16000];
 #ifdef USE_SDL
 
 static SDL_Surface* screen = NULL;
-static SDL_Surface* texture = NULL;
+static int audio_open = 0;
+static int audio_sample_rate = 22050;
+static int speaker_frequency = 0;
+static int speaker_samples_remaining = 0;
+static int speaker_total_samples = 0;
+static double speaker_phase = 0.0;
+
+typedef struct {
+	unsigned short frequency;
+	unsigned short duration_ms;
+} SpeakerTone;
+
+static const SpeakerTone speaker_tones[0x1a] = {
+	{ 0, 0 },
+	{ 880, 70 }, { 660, 80 }, { 740, 80 }, { 520, 100 },
+	{ 1047, 110 }, { 440, 100 }, { 587, 110 }, { 784, 120 },
+	{ 698, 100 }, { 392, 130 }, { 988, 90 }, { 523, 120 },
+	{ 622, 100 }, { 831, 120 }, { 554, 100 }, { 740, 90 },
+	{ 659, 120 }, { 494, 100 }, { 932, 100 }, { 587, 90 },
+	{ 784, 100 }, { 466, 120 }, { 659, 90 }, { 880, 120 },
+	{ 349, 150 }
+};
+
+static void speaker_audio_callback(void *userdata, Uint8 *stream, int length)
+{
+	Sint16 *samples = (Sint16*)stream;
+	int sample_count = length / (int)sizeof(*samples);
+	int sample_index;
+	int ramp_samples = audio_sample_rate / 200;
+	double phase_step;
+
+	(void)userdata;
+	memset(stream, 0, length);
+	if (speaker_frequency <= 0 || speaker_samples_remaining <= 0)
+		return;
+
+	phase_step = 6.283185307179586 * speaker_frequency / audio_sample_rate;
+	for (sample_index = 0; sample_index < sample_count && speaker_samples_remaining > 0; sample_index++) {
+		int elapsed = speaker_total_samples - speaker_samples_remaining;
+		int edge_samples = elapsed;
+		int amplitude = 5000;
+
+		if (speaker_samples_remaining < edge_samples)
+			edge_samples = speaker_samples_remaining;
+		if (edge_samples < ramp_samples && ramp_samples > 0)
+			amplitude = amplitude * edge_samples / ramp_samples;
+
+		samples[sample_index] = speaker_phase < 3.141592653589793 ? (Sint16)amplitude : (Sint16)-amplitude;
+		speaker_phase += phase_step;
+		if (speaker_phase >= 6.283185307179586)
+			speaker_phase -= 6.283185307179586;
+		speaker_samples_remaining--;
+	}
+}
 
 /* High intensity CGA Palette 1 colors */
 static const unsigned int cga_palette[4] = {
@@ -32,6 +85,22 @@ void init_sdl_graphics(void)
 	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_TIMER) < 0) {
 		fprintf(stderr, "SDL could not initialize: %s\n", SDL_GetError());
 		return;
+	}
+
+	{
+		SDL_AudioSpec desired_audio;
+		memset(&desired_audio, 0, sizeof(desired_audio));
+		desired_audio.freq = audio_sample_rate;
+		desired_audio.format = AUDIO_S16SYS;
+		desired_audio.channels = 1;
+		desired_audio.samples = 512;
+		desired_audio.callback = speaker_audio_callback;
+		if (SDL_OpenAudio(&desired_audio, NULL) == 0) {
+			audio_open = 1;
+			SDL_PauseAudio(0);
+		} else {
+			fprintf(stderr, "SDL audio could not be opened: %s\n", SDL_GetError());
+		}
 	}
 
 	SDL_WM_SetCaption("Karateka - Windows Port", 0);
@@ -57,7 +126,10 @@ void init_sdl_graphics(void)
 void close_sdl_graphics(void)
 {
 #ifdef USE_SDL
-
+	if (audio_open) {
+		SDL_CloseAudio();
+		audio_open = 0;
+	}
 	if (screen) {
 		SDL_FreeSurface(screen);
 		screen = NULL;
@@ -227,10 +299,27 @@ int C_46CC(void)
 	return 0; /* Report no joystick connected to default to keyboard */
 }
 
-/* Audio toggle sound routine stub */
+/* Play the sound ID as a short PC-speaker-style square wave. */
 void sound(int id)
 {
-	/* Audio synthesis will reside here */
+#ifdef USE_SDL
+	if (!audio_open || id <= 0 || id >= (int)(sizeof(speaker_tones) / sizeof(speaker_tones[0])))
+		return;
+
+	SDL_LockAudio();
+	speaker_frequency = speaker_tones[id].frequency;
+	speaker_total_samples = audio_sample_rate * speaker_tones[id].duration_ms / 1000;
+	speaker_samples_remaining = speaker_total_samples;
+	speaker_phase = 0.0;
+	SDL_UnlockAudio();
+#else
+	(void)id;
+#endif
+}
+
+void Beep(void)
+{
+	sound(5);
 }
 
 /* Stub/Bypass definitions for DOS/BIOS hardware setup */
