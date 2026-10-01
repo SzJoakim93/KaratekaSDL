@@ -219,8 +219,6 @@ void renderBG(int bg)
 			memset(&cga_buffer[row * 80], floor_pattern, 80);
 			floor_pattern = ~floor_pattern;
 		}
-		//memset(&cga_buffer[150 * 80], floor_pattern, 80);
-		//memset(&cga_buffer[165 * 80], floor_pattern, 15 * 80);
 	} else {
 		/* Indoor palace rendering */
 		C_0E39();
@@ -231,14 +229,16 @@ void renderBG(int bg)
 				memset(&cga_buffer[90 * 80], 0x00, 1 * 80);
 			}
 			/* Draw dithered floor pattern */
-			memset(&cga_buffer[150 * 80], 0xAA, 15 * 80);
-			memset(&cga_buffer[165 * 80], 0x00, 15 * 80);
+			for (int row = 154; row < 184; row++) {
+				memset(&cga_buffer[row * 80], row % 2 ? 0xAA : 0x00, 15 * 80);
+			}
 		} else {
 			if (cameraClamp != D_B9BA) {
 				memset(cga_buffer, 0x00, 114 * 80);
 			}
-			memset(&cga_buffer[150 * 80], 0x55, 15 * 80);
-			memset(&cga_buffer[165 * 80], 0x00, 15 * 80);
+			for (int row = 154; row < 184; row++) {
+				memset(&cga_buffer[row * 80], row % 2 ? 0x55 : 0x00, 15 * 80);
+			}
 		}
 	}
 }
@@ -481,13 +481,11 @@ int C_177B(void)
 			}
 			case 0x06: { /* SCRIPT_06/chg_fig */
 				int chg_idx = D_BB94[script_idx + 1];
-				unsigned short val2 = D_BB94[script_idx + 2] | (D_BB94[script_idx + 3] << 8);
-				unsigned short val4 = D_BB94[script_idx + 4] | (D_BB94[script_idx + 5] << 8);
-				unsigned char *ptr = (unsigned char*)&D_B9C0[3];
-				ptr[chg_idx * 4 + 3] = val2 & 0xFF;
-				ptr[chg_idx * 4 + 4] = val2 >> 8;
-				ptr[chg_idx * 4 + 5] = val4 & 0xFF;
-				ptr[chg_idx * 4 + 6] = val4 >> 8;
+				int entry_offset = 3 + chg_idx * 4;
+				D_B9C0[entry_offset] = D_BB94[script_idx + 2];
+				D_B9C0[entry_offset + 1] = D_BB94[script_idx + 3];
+				D_B9C0[entry_offset + 2] = D_BB94[script_idx + 4];
+				D_B9C0[entry_offset + 3] = D_BB94[script_idx + 5];
 				script_idx += 6;
 				break;
 			}
