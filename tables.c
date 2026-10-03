@@ -109,9 +109,6 @@ unsigned int D_0168 = 0;
 void C_4055(void);
 int C_3F83(void);
 int C_3F9E(void);
-int C_3FE4(void);
-int C_4007(void);
-int C_3F6C(void);
 
 /* ------------------------------------------------------------------
    Runtime initialiser – allocate the render buffer.

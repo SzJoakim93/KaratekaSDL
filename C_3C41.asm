@@ -1003,9 +1003,9 @@ C_3F63:
 C_3F6B:
 	RET
 ;----------------------------------------
-PUBLIC C_3F6C
+PUBLIC intro_story_scroll
 ;story scroll
-C_3F6C:
+intro_story_scroll:
 	CALL	BB_clear
 	CALL	BB_flip
 
@@ -1073,8 +1073,8 @@ C_3FCA:	;-- --
 C_3FE3:
 	RET
 ;----------------------------------------
-PUBLIC C_3FE4
-C_3FE4:
+PUBLIC intro_developer
+intro_developer:
 	CALL	BB_clear
 	
 	LEA	DI,cga_buffer[1A5Bh]
@@ -1092,8 +1092,8 @@ C_3FE4:
 
 	RET
 ;----------------------------------------
-PUBLIC C_4007
-C_4007:
+PUBLIC intro_ibm_port
+intro_ibm_port:
 	CALL	BB_clear
 	
 	LEA	DI,cga_buffer[1A56h]

@@ -1194,9 +1194,9 @@ wipe_delay:
 
 	RET	
 ;----------------------------------------
-PUBLIC C_0F57
+PUBLIC intro_karateka_title
 ;"KARATEKA"
-C_0F57:
+intro_karateka_title:
 	CALL	BB_clear
 	;--
 	PUSH	ES
@@ -1230,9 +1230,9 @@ C_0F57:
 	POP	ES
 	RET	
 ;----------------------------------------
-PUBLIC C_0F90
+PUBLIC intro_publisher
 ;"broderbund software presents"
-C_0F90:
+intro_publisher:
 	;-- --
 	CALL	BB_clear
 	;-- --

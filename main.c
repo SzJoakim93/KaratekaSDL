@@ -293,24 +293,24 @@ C_03DE()
 			D_41B7 = 0;
 		}
 		/*-- --*/
-		if(C_0F90()) {/*"broderbund software presents"*/
+		if(intro_publisher()) {/*"broderbund software presents"*/
 			C_0616();/*little intro*/
 			break;
 		}
 		load_background_graphics(/*4292*/"title.bcg", 0);
-		if(C_3FE4()) {/*"a game by jordan mechner"*/
+		if(intro_developer()) {/*"a game by jordan mechner"*/
 			C_0616();/*little intro*/
 			break;
 		}
-		if(C_4007()) {/*"IBM version by the connelley group"*/
+		if(intro_ibm_port()) {/*"IBM version by the connelley group"*/
 			C_0616();/*little intro*/
 			break;
 		}
-		if(C_0F57()) {/*"KARATEKA"*/
+		if(intro_karateka_title()) {/*"KARATEKA"*/
 			C_0616();/*little intro*/
 			break;
 		}
-		if(C_3F6C()) {/*story scroll*/
+		if(intro_story_scroll()) {/*story scroll*/
 			C_0616();/*little intro*/
 			break;
 		}

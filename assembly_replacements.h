@@ -18,8 +18,11 @@ int k_rand(int range);
 void render(void);
 void putFig(int fig, int x, int y);
 void putFig_flipx(int fig, int x, int y);
-int C_0F57(void); /* Draws intro KARATEKA text */
-int C_0F90(void); /* Draws Broderbund screen */
+int intro_karateka_title(void); /* Draws intro KARATEKA text */
+int intro_publisher(void); /* Draws Broderbund screen */
+int intro_story_scroll(void);
+int intro_developer(void);
+int intro_ibm_port(void);
 
 /* Low level helpers (from C_41BE.ASM) */
 void Beep(void);

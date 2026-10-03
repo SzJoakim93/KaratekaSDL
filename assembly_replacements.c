@@ -286,8 +286,92 @@ void render(void)
 	D_B9BA = cameraClamp;
 }
 
+static void draw_cga_pixel(int x, int y, unsigned char color)
+{
+	if (x < 0 || x >= 320 || y < 0 || y >= 200)
+		return;
+
+	int byte_idx = y * 80 + (x / 4);
+	int bit_shift = 6 - (2 * (x % 4));
+	cga_buffer[byte_idx] &= (unsigned char)~(0x03u << bit_shift);
+	cga_buffer[byte_idx] |= (unsigned char)((color & 0x03u) << bit_shift);
+}
+
+/* 5x7 font tuned to the original DOS text renderer in C_3C41.asm. */
+static const unsigned char font_5x7[26][7] = {
+	{ 0x7E, 0x09, 0x09, 0x09, 0x7E, 0x00, 0x00 },
+	{ 0x7F, 0x49, 0x49, 0x49, 0x36, 0x00, 0x00 },
+	{ 0x3E, 0x41, 0x41, 0x41, 0x22, 0x00, 0x00 },
+	{ 0x7F, 0x41, 0x41, 0x22, 0x1C, 0x00, 0x00 },
+	{ 0x7F, 0x49, 0x49, 0x49, 0x41, 0x00, 0x00 },
+	{ 0x7F, 0x09, 0x09, 0x09, 0x01, 0x00, 0x00 },
+	{ 0x3E, 0x41, 0x49, 0x49, 0x7A, 0x00, 0x00 },
+	{ 0x7F, 0x08, 0x08, 0x08, 0x7F, 0x00, 0x00 },
+	{ 0x00, 0x41, 0x7F, 0x41, 0x00, 0x00, 0x00 },
+	{ 0x20, 0x40, 0x41, 0x3F, 0x01, 0x00, 0x00 },
+	{ 0x7F, 0x08, 0x14, 0x22, 0x41, 0x00, 0x00 },
+	{ 0x7F, 0x40, 0x40, 0x40, 0x40, 0x00, 0x00 },
+	{ 0x7F, 0x02, 0x04, 0x02, 0x7F, 0x00, 0x00 },
+	{ 0x7F, 0x02, 0x04, 0x08, 0x7F, 0x00, 0x00 },
+	{ 0x3E, 0x41, 0x41, 0x41, 0x3E, 0x00, 0x00 },
+	{ 0x7F, 0x09, 0x09, 0x09, 0x06, 0x00, 0x00 },
+	{ 0x3E, 0x41, 0x51, 0x21, 0x5E, 0x00, 0x00 },
+	{ 0x7F, 0x09, 0x19, 0x29, 0x46, 0x00, 0x00 },
+	{ 0x46, 0x49, 0x49, 0x49, 0x31, 0x00, 0x00 },
+	{ 0x01, 0x01, 0x7F, 0x01, 0x01, 0x00, 0x00 },
+	{ 0x3F, 0x40, 0x40, 0x20, 0x3F, 0x00, 0x00 },
+	{ 0x1F, 0x20, 0x40, 0x20, 0x1F, 0x00, 0x00 },
+	{ 0x3F, 0x40, 0x38, 0x40, 0x3F, 0x00, 0x00 },
+	{ 0x63, 0x14, 0x08, 0x14, 0x63, 0x00, 0x00 },
+	{ 0x07, 0x08, 0x70, 0x08, 0x07, 0x00, 0x00 },
+	{ 0x61, 0x51, 0x49, 0x45, 0x43, 0x00, 0x00 }
+};
+
+static void draw_font_char(int x, int y, char ch, unsigned char color)
+{
+	if (ch == ' ') return;
+	if (ch >= 'A' && ch <= 'Z') ch = (char)(ch - 'A' + 'a');
+	if (ch < 'a' || ch > 'z') return;
+
+	int idx = ch - 'a';
+	for (int row = 0; row < 7; row++) {
+		unsigned char bits = font_5x7[idx][row];
+		for (int col = 0; col < 5; col++) {
+			if (bits & (1u << (4 - col)))
+				draw_cga_pixel(x + col, y + row, color);
+		}
+	}
+}
+
+static void draw_text_block(int x, int y, const char *text, unsigned char color)
+{
+	int cursor_x = x;
+	for (const char *p = text; *p != '\0'; p++) {
+		unsigned char ch = (unsigned char)*p;
+		if (ch == '\n' || ch == '\r') {
+			y += 12;
+			cursor_x = x;
+			continue;
+		}
+		if (ch == ' ') {
+			cursor_x += 6;
+			continue;
+		}
+		draw_font_char(cursor_x, y, (char)ch, color);
+		cursor_x += 6;
+	}
+}
+
+static void draw_intro_text_screen(const char *top_line, const char *bottom_line)
+{
+	BB_clear();
+	draw_text_block(42, 78, top_line, 3);
+	draw_text_block(30, 96, bottom_line, 3);
+	BB_flip();
+}
+
 /* Draws intro title screen */
-int C_0F57(void)
+int intro_karateka_title(void)
 {
 	BB_clear();
 	memcpy(&cga_buffer[0x15E0], D_A606, 0x1040);
@@ -300,7 +384,7 @@ int C_0F57(void)
 }
 
 /* Draws Broderbund logo screen */
-int C_0F90(void)
+int intro_publisher(void)
 {
 	BB_clear();
 	putFig(0x5B, 106, 115);
@@ -309,6 +393,71 @@ int C_0F90(void)
 	int ret = C_191C(0x48);
 	D_0168 = 0;
 	return ret;
+}
+
+/* "a game by" / "jordan mechner" */
+int intro_developer(void)
+{
+	draw_intro_text_screen("a game by", "jordan mechner");
+	return C_191C(0x48);
+}
+
+/* "ibm version by" / "the connelley group" */
+int intro_ibm_port(void)
+{
+	draw_intro_text_screen("ibm version by", "the connelley group");
+	return C_191C(0x48);
+}
+
+/* Opening story scroll */
+int intro_story_scroll(void)
+{
+	static const char *story_lines[] = {
+		"high atop a craggy cliff",
+		"guarded by an army of",
+		"fierce warriors stands the",
+		"fortress of the evil",
+		"warlord akuma deep in the",
+		"darkest dungeon of the",
+		"castle akuma gloats over",
+		"his lovely captive the",
+		"princess mariko",
+		"",
+		"you are one trained in the",
+		"way of karate a karateka",
+		"alone and unarmed you must",
+		"defeat akuma and rescue the",
+		"beautiful mariko",
+		"",
+		"put fear and self concern",
+		"behind you focus your will",
+		"on your objective accepting",
+		"death as a possibility this",
+		"is the way of the karateka"
+	};
+
+	const int line_count = (int)(sizeof(story_lines) / sizeof(story_lines[0]));
+	const int scroll_end = 200 + (line_count - 1) * 14 + 7;
+	BB_clear();
+	BB_flip();
+	script_frame_pace_reset();
+
+	for (int scroll_offset = 0; scroll_offset <= scroll_end; scroll_offset++) {
+		BB_clear();
+		for (int line = 0; line < line_count; line++) {
+			int y = 200 + line * 14 - scroll_offset;
+			if (y >= -7 && y < 200 && story_lines[line][0] != '\0')
+				draw_text_block(18, y, story_lines[line], 3);
+		}
+		BB_flip();
+		script_frame_pace(55);
+		DoInput(0);
+		if (isKeyPending != 0) {
+			GetKey();
+			return 1;
+		}
+	}
+	return 0;
 }
 
 /* Stub/Null exit routines */
@@ -439,6 +588,7 @@ int C_1705(char* buffer)
 int C_177B(void)
 {
 	D_BB60 = 1;
+	script_frame_pace_reset();
 	/* SCRIPT_12/init_sal behavior */
 	D_B9BA = -1;
 	D_00EE = 1;
@@ -491,6 +641,7 @@ int C_177B(void)
 			}
 			case 0x08: /* SCRIPT_08/do_scr */
 				render();
+				script_frame_pace(165);
 				script_idx += 1;
 				break;
 			case 0x0A: { /* SCRIPT_0a/del_fig */

@@ -1,11 +1,5 @@
 #include <stdio.h>
 
-// Stub implementations for missing assembly functions.
-
-// Functions returning int
-int C_3FE4(void) { return 1; }
-int C_4007(void) { return 1; }
-int C_3F6C(void) { return 1; }
 int C_3F83(void) { return 1; }
 int C_3F9E(void) { return 1; }
 
