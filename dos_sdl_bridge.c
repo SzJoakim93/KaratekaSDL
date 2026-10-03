@@ -15,25 +15,34 @@ extern char cga_buffer[16000];
 static SDL_Surface* screen = NULL;
 static int audio_open = 0;
 static int audio_sample_rate = 22050;
-static int speaker_frequency = 0;
+static int speaker_start_frequency = 0;
+static int speaker_end_frequency = 0;
 static int speaker_samples_remaining = 0;
 static int speaker_total_samples = 0;
 static double speaker_phase = 0.0;
 
 typedef struct {
-	unsigned short frequency;
+	unsigned short start_frequency;
+	unsigned short end_frequency;
 	unsigned short duration_ms;
 } SpeakerTone;
 
+/* The original hit effects use changing speaker-toggle rates rather than fixed notes. */
 static const SpeakerTone speaker_tones[0x1a] = {
-	{ 0, 0 },
-	{ 880, 70 }, { 660, 80 }, { 740, 80 }, { 520, 100 },
-	{ 1047, 110 }, { 440, 100 }, { 587, 110 }, { 784, 120 },
-	{ 698, 100 }, { 392, 130 }, { 988, 90 }, { 523, 120 },
-	{ 622, 100 }, { 831, 120 }, { 554, 100 }, { 740, 90 },
-	{ 659, 120 }, { 494, 100 }, { 932, 100 }, { 587, 90 },
-	{ 784, 100 }, { 466, 120 }, { 659, 90 }, { 880, 120 },
-	{ 349, 150 }
+	{ 0, 0, 0 },
+	{ 7800, 270, 52 }, { 7800, 435, 23 },
+	{ 3140, 3140, 3 }, { 1570, 1570, 10 },
+	{ 980, 7800, 2 }, { 980, 980, 3 },
+	{ 587, 587, 120 }, { 784, 784, 120 },
+	{ 698, 698, 100 }, { 392, 392, 130 },
+	{ 988, 988, 90 }, { 523, 523, 120 },
+	{ 622, 622, 100 }, { 831, 831, 120 },
+	{ 554, 554, 100 }, { 740, 740, 90 },
+	{ 659, 659, 120 }, { 494, 494, 100 },
+	{ 932, 932, 100 }, { 587, 587, 90 },
+	{ 784, 784, 100 }, { 466, 466, 120 },
+	{ 659, 659, 90 }, { 880, 880, 120 },
+	{ 349, 349, 150 }
 };
 
 static void speaker_audio_callback(void *userdata, Uint8 *stream, int length)
@@ -43,23 +52,31 @@ static void speaker_audio_callback(void *userdata, Uint8 *stream, int length)
 	int sample_index;
 	int ramp_samples = audio_sample_rate / 200;
 	double phase_step;
+	double frequency;
 
 	(void)userdata;
 	memset(stream, 0, length);
-	if (speaker_frequency <= 0 || speaker_samples_remaining <= 0)
+	if (speaker_start_frequency <= 0 || speaker_end_frequency <= 0 || speaker_samples_remaining <= 0)
 		return;
+	if (ramp_samples > speaker_total_samples / 4)
+		ramp_samples = speaker_total_samples / 4;
+	if (ramp_samples < 1)
+		ramp_samples = 1;
 
-	phase_step = 6.283185307179586 * speaker_frequency / audio_sample_rate;
 	for (sample_index = 0; sample_index < sample_count && speaker_samples_remaining > 0; sample_index++) {
 		int elapsed = speaker_total_samples - speaker_samples_remaining;
 		int edge_samples = elapsed;
 		int amplitude = 5000;
+		double progress = (double)elapsed / speaker_total_samples;
 
 		if (speaker_samples_remaining < edge_samples)
 			edge_samples = speaker_samples_remaining;
 		if (edge_samples < ramp_samples && ramp_samples > 0)
 			amplitude = amplitude * edge_samples / ramp_samples;
 
+		frequency = speaker_start_frequency +
+			(speaker_end_frequency - speaker_start_frequency) * progress;
+		phase_step = 6.283185307179586 * frequency / audio_sample_rate;
 		samples[sample_index] = speaker_phase < 3.141592653589793 ? (Sint16)amplitude : (Sint16)-amplitude;
 		speaker_phase += phase_step;
 		if (speaker_phase >= 6.283185307179586)
@@ -331,7 +348,8 @@ void sound(int id)
 		return;
 
 	SDL_LockAudio();
-	speaker_frequency = speaker_tones[id].frequency;
+	speaker_start_frequency = speaker_tones[id].start_frequency;
+	speaker_end_frequency = speaker_tones[id].end_frequency;
 	speaker_total_samples = audio_sample_rate * speaker_tones[id].duration_ms / 1000;
 	speaker_samples_remaining = speaker_total_samples;
 	speaker_phase = 0.0;
