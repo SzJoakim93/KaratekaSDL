@@ -51,8 +51,10 @@ load_castle_bg()
 	read(h, cga_buffer, bp06);
 	close(h);
 
+	WaitNoKey();
 	BB_flip();
 	sound(0x19);
+	C_191C(0x48);
 }
 
 /*load ks/km files*/
