@@ -1,0 +1,5 @@
+s_Fig	STRUC
+	f_00	DB ?	;fig
+	f_01	DW ?	;x
+	f_03	DB ?	;y
+s_Fig	ENDS
