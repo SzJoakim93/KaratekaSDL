@@ -1,6 +1,6 @@
 /*
 	KARATEKA - SDL Port Bridge
-	Copyright 2026 Retro Porting Project
+	Copyright 2026 SzJoakim93
 */
 #include <stdio.h>
 #include <string.h>
@@ -13,6 +13,9 @@ extern char cga_buffer[16000];
 #ifdef USE_SDL
 
 static SDL_Surface* screen = NULL;
+static int windowed_width = 640;
+static int windowed_height = 400;
+static int fullscreen_mode = 0;
 static int audio_open = 0;
 static int audio_sample_rate = 22050;
 static int speaker_start_frequency = 0;
@@ -93,6 +96,43 @@ static const unsigned int cga_palette[4] = {
 	0xFFFFFFFF  /* Color 3: White */
 };
 
+static int set_video_mode(int width, int height, int fullscreen)
+{
+	Uint32 flags = SDL_SWSURFACE | SDL_ANYFORMAT;
+	SDL_Surface *new_screen;
+
+	if (fullscreen) {
+		flags |= SDL_FULLSCREEN;
+	} else {
+		flags |= SDL_RESIZABLE;
+	}
+
+	new_screen = SDL_SetVideoMode(width, height, 32, flags);
+	if (!new_screen) {
+		fprintf(stderr, "Video mode could not be changed: %s\n", SDL_GetError());
+		return 0;
+	}
+
+	screen = new_screen;
+	fullscreen_mode = fullscreen;
+	return 1;
+}
+
+static void toggle_fullscreen(void)
+{
+	if (fullscreen_mode) {
+		set_video_mode(windowed_width, windowed_height, 0);
+	} else {
+		const SDL_VideoInfo *video_info = SDL_GetVideoInfo();
+
+		if (!video_info || video_info->current_w <= 0 || video_info->current_h <= 0) {
+			fprintf(stderr, "Desktop resolution could not be determined: %s\n", SDL_GetError());
+			return;
+		}
+		set_video_mode(video_info->current_w, video_info->current_h, 1);
+	}
+}
+
 #endif
 
 /* Initialize the SDL graphics subsystem and window*/
@@ -120,16 +160,9 @@ void init_sdl_graphics(void)
 		}
 	}
 
-	SDL_WM_SetCaption("Karateka - Windows Port", 0);
+	SDL_WM_SetCaption("Karateka SDL", 0);
 
-	screen = SDL_SetVideoMode(
-		640,
-		400,
-		32,
-		SDL_SWSURFACE | SDL_ANYFORMAT
-	);
-
-	if (!screen) {
+	if (!set_video_mode(windowed_width, windowed_height, 0)) {
 		fprintf(stderr, "Window could not be created: %s\n", SDL_GetError());
 		return;
 	}
@@ -147,10 +180,7 @@ void close_sdl_graphics(void)
 		SDL_CloseAudio();
 		audio_open = 0;
 	}
-	if (screen) {
-		SDL_FreeSurface(screen);
-		screen = NULL;
-	}
+	screen = NULL;
 	SDL_Quit();
 #endif
 }
@@ -161,31 +191,52 @@ void BB_clear(void)
 	memset(cga_buffer, 0, 16000);
 }
 
-/* Present linear CGA backbuffer to 640x400 window with 2x integer scale */
+/* Present the CGA backbuffer scaled to fit the current video surface. */
 void BB_flip(void)
 {
 #ifdef USE_SDL
-	int x, y;
+	int x, y, scaled_width, scaled_height, offset_x, offset_y;
+	int surface_stride;
+	Uint32 mapped_palette[4];
+	unsigned int color_index;
 	if (!screen) return;
+
+	if (screen->w * 200 >= screen->h * 320) {
+		scaled_height = screen->h;
+		scaled_width = scaled_height * 320 / 200;
+	} else {
+		scaled_width = screen->w;
+		scaled_height = scaled_width * 200 / 320;
+	}
+	if (scaled_width < 1 || scaled_height < 1)
+		return;
+
+	offset_x = (screen->w - scaled_width) / 2;
+	offset_y = (screen->h - scaled_height) / 2;
+	surface_stride = screen->pitch / (int)sizeof(Uint32);
+	for (color_index = 0; color_index < 4; color_index++) {
+		mapped_palette[color_index] = SDL_MapRGB(screen->format,
+			(Uint8)(cga_palette[color_index] >> 16),
+			(Uint8)(cga_palette[color_index] >> 8),
+			(Uint8)cga_palette[color_index]);
+	}
+
+	SDL_FillRect(screen, NULL, mapped_palette[0]);
 	if (SDL_MUSTLOCK(screen)) SDL_LockSurface(screen);
 
 	Uint32 *pixels = (Uint32*)screen->pixels;
 
-	for (y = 0; y < 200; y++) {
-		for (x = 0; x < 320; x++) {
-			int byte_idx = y * 80 + (x / 4);
-			int pixel_shift = 6 - (2 * (x % 4));
-			int color_idx = (cga_buffer[byte_idx] >> pixel_shift) & 0x03;
-			unsigned int color = cga_palette[color_idx];
+	for (y = 0; y < scaled_height; y++) {
+		int source_y = y * 200 / scaled_height;
+		for (x = 0; x < scaled_width; x++) {
+			int source_x = x * 320 / scaled_width;
+			int byte_idx = source_y * 80 + (source_x / 4);
+			int pixel_shift = 6 - (2 * (source_x % 4));
+			unsigned char source_byte = (unsigned char)cga_buffer[byte_idx];
+			int color_idx = (source_byte >> pixel_shift) & 0x03;
 
-			/* Upscale 320x200 pixel to 2x2 grid in 640x400 display */
-			int dest_x = x * 2;
-			int dest_y = y * 2;
-
-			pixels[dest_y * 640 + dest_x] = color;
-			pixels[dest_y * 640 + (dest_x + 1)] = color;
-			pixels[(dest_y + 1) * 640 + dest_x] = color;
-			pixels[(dest_y + 1) * 640 + (dest_x + 1)] = color;
+			pixels[(offset_y + y) * surface_stride + offset_x + x] =
+				mapped_palette[color_idx];
 		}
 	}
 
@@ -303,11 +354,22 @@ int DoInput(int wait_for_key)
 			exit(0);
 		}
 		else if (event.type == SDL_KEYDOWN) {
+			if (event.key.keysym.sym == SDLK_RETURN &&
+				(event.key.keysym.mod & KMOD_ALT)) {
+				toggle_fullscreen();
+				continue;
+			}
 			unsigned char mappedKey = map_sdl_keycode(event.key.keysym.sym);
 			if (mappedKey > 0) {
 				pressedKey = mappedKey;
 				isKeyPending = 1;
 				return 1;
+			}
+		}
+		else if (event.type == SDL_VIDEORESIZE && !fullscreen_mode) {
+			if (set_video_mode(event.resize.w, event.resize.h, 0)) {
+				windowed_width = event.resize.w;
+				windowed_height = event.resize.h;
 			}
 		}
 	}
