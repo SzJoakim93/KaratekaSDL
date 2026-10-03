@@ -22,6 +22,8 @@ void BB_flip_wipe(void);
 /* Timer Abstractions */
 void tim_strt(void);
 void tim_wait(void);
+void script_frame_pace_reset(void);
+void script_frame_pace(unsigned int frame_duration_ms);
 void C_1906(int ticks); /* BIOS timer tick loop replacement */
 void delay_ms(int ms);
 

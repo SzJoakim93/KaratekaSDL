@@ -191,6 +191,7 @@ void BB_flip_wipe(void)
 
 /* Timer ticks mapping using SDL_GetTicks */
 static unsigned int timer_start_ticks = 0;
+static unsigned int previous_script_frame_ticks = 0;
 
 void tim_strt(void)
 {
@@ -207,6 +208,29 @@ void tim_wait(void)
 		SDL_Delay(1);
 	}
 	timer_start_ticks = SDL_GetTicks();
+#endif
+}
+
+void script_frame_pace_reset(void)
+{
+#ifdef USE_SDL
+	previous_script_frame_ticks = SDL_GetTicks();
+#endif
+}
+
+void script_frame_pace(unsigned int frame_duration_ms)
+{
+#ifdef USE_SDL
+	unsigned int now = SDL_GetTicks();
+	unsigned int elapsed;
+
+	elapsed = now - previous_script_frame_ticks;
+	if (elapsed < frame_duration_ms) {
+		SDL_Delay(frame_duration_ms - elapsed);
+	}
+	previous_script_frame_ticks = SDL_GetTicks();
+#else
+	(void)frame_duration_ms;
 #endif
 }
 
