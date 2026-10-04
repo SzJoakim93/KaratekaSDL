@@ -339,11 +339,24 @@ static void draw_text_block(int x, int y, const char *text, unsigned char color)
 	}
 }
 
+static int text_width(const char *text)
+{
+	int width = 0;
+	for (const char *p = text; *p != '\0'; p++) {
+		char ch = *p;
+		if (ch >= 'A' && ch <= 'Z')
+			ch = (char)(ch - 'A' + 'a');
+		int idx = font_index(ch);
+		width += idx < 0 ? 8 : font_advance_px[idx];
+	}
+	return width;
+}
+
 static void draw_intro_text_screen(const char *top_line, const char *bottom_line)
 {
 	BB_clear();
-	draw_text_block(42, 78, top_line, 3);
-	draw_text_block(30, 96, bottom_line, 3);
+	draw_text_block((320 - text_width(top_line)) / 2, 78, top_line, 3);
+	draw_text_block((320 - text_width(bottom_line)) / 2, 96, bottom_line, 3);
 	BB_flip();
 }
 
