@@ -24,8 +24,9 @@ const unsigned char D_E060[10] = { 2,2,0,0,0,2,2,2,0,2 };
 const unsigned char D_E06A[10] = { 2,0,2,0,0,2,2,2,0,2 };
 const unsigned char D_E074[10] = { 0,0,0,0,0,0,0,0,2,0 };
 
-const short D_E07E[12] = {
+const short D_E07E[18] = {
     0x28, 0x2A, 0x26, 0x22, 0x22, 0x1C,
+    -4, -4, -4, -0x14, -0x14, -0x14,
     -4, -4, -4, -0x14, -0x14, -0x14
 };
 

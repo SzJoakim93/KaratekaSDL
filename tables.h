@@ -15,7 +15,7 @@ extern const unsigned char D_E056[10];
 extern const unsigned char D_E060[10];
 extern const unsigned char D_E06A[10];
 extern const unsigned char D_E074[10];
-extern const short        D_E07E[12];
+extern const short        D_E07E[18];
 extern const unsigned char D_E0A2[18];
 
 /* Index and data tables used by the graphics engine */

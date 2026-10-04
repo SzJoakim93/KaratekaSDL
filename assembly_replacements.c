@@ -158,6 +158,10 @@ void putFig_flipx(int fig, int x, int y)
 				unsigned char mask_val = (m >> shift) & 0x03;
 				unsigned char data_val = (d >> shift) & 0x03;
 
+				if (data_val == 2) {
+					data_val = 1;
+				}
+
 				if (mask_val != 0) {
 					write_pixel(px, py, data_val);
 				}
@@ -532,7 +536,7 @@ void C_44F4(int type, int offset)
 	}
 	
 	si += 4;
-	val_x += D_E07E[bx];
+	val_x += D_E07E[bx / 2];
 	if (D_0130 == 7) {
 		val_x -= 0x23;
 	}
