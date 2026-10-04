@@ -21,13 +21,19 @@ COMPILER_FLAGS = -w -g -std=c99 -DUSE_SDL=1
 
 ifeq ($(OS),Windows_NT)
 	LINKER_FLAGS = -mwindows -lMingw32 -lSDLmain -lSDL
+	RESOURCE = Data/icon.o
 else
 	LINKER_FLAGS = -lSDL
 endif
 
 #OBJ_NAME specifies the name of our exectuable
-OBJ_NAME = Data/karateka-sdl
+OBJ_NAME = Data/Karateka-SDL
 
 #This is the target that compiles our executable
-all : $(OBJS)
-	$(CC) $(OBJS) $(COMPILER_FLAGS) $(LINKER_FLAGS) -o $(OBJ_NAME)
+all : $(OBJS) $(RESOURCE)
+	$(CC) $(OBJS) $(RESOURCE) $(COMPILER_FLAGS) $(LINKER_FLAGS) -o $(OBJ_NAME)
+
+ifeq ($(OS),Windows_NT)
+Data/icon.o: icon.rc icon.ico
+	windres -i icon.rc -O coff -o $@
+endif
