@@ -360,6 +360,29 @@ static void draw_intro_text_screen(const char *top_line, const char *bottom_line
 	BB_flip();
 }
 
+int quit_confirmation_scene(void)
+{
+	static const char *question = "Are you sure want to quit?";
+	static const char *choices = "Y / N";
+
+	for (;;) {
+		BB_clear();
+		draw_text_block((320 - text_width(question)) / 2, 86, question, 3);
+		draw_text_block((320 - text_width(choices)) / 2, 106, choices, 3);
+		BB_flip();
+
+		WaitKey();
+		switch (GetKey()) {
+			case 'y':
+			case 'Y':
+				return 1;
+			case 'n':
+			case 'N':
+				return 0;
+		}
+	}
+}
+
 /* Draws intro title screen */
 int intro_karateka_title(void)
 {

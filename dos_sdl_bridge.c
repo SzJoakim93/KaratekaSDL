@@ -330,6 +330,8 @@ static unsigned char map_sdl_keycode(int sdl_key)
 		case SDLK_UP:     return '8';
 		case SDLK_DOWN:   return '2';
 		case SDLK_q:      return 'q';
+		case SDLK_y:      return 'y';
+		case SDLK_n:      return 'n';
 		case SDLK_a:      return 'a';
 		case SDLK_z:      return 'z';
 		case SDLK_w:      return 'w';

@@ -12,6 +12,7 @@ some alpha/beta versions can be found at:
 
 #include "karateka.h"
 #include "assembly_replacements.h"
+#include "dos_sdl_bridge.h"
 #include "main.h"
 
 /*-- --*/
@@ -220,6 +221,14 @@ int D_41B9 = 0;
 		/*-- game loop --*//*032A*/
 		while(D_016A != 1 && D_DE70 <= 0) {
 			DoInput(1);
+			if(pressedKey == 0x1B) {
+				isKeyPending = 0;
+				if(quit_confirmation_scene()) {
+					close_sdl_graphics();
+					return 0;
+				}
+				continue;
+			}
 			tim_wait();
 			C_2366();
 			C_2C62();
