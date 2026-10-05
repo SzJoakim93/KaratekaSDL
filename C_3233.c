@@ -6,6 +6,7 @@
 
 */
 #include "karateka.h"
+#include "assembly_replacements.h"
 
 /*---- ----*/
 int D_D502 = 0;
@@ -26,7 +27,7 @@ int D_D50E = 0;
 /*D546	"cal07"*/
 /*---- ----*/
 
-C_3233()
+int C_3233()
 {
 	int bp04;
 
@@ -398,7 +399,7 @@ C_3233()
 	return 0;
 }
 
-C_3AC0(bp06)
+void C_3AC0(bp06)
 int bp06;
 {
 	if(D_D502 == 1)
@@ -418,7 +419,7 @@ int bp06;
 	C_3B1D();
 }
 
-C_3B1D()
+void C_3B1D()
 {
 	D_B9BA = -1;
 	D_D4E2 = 0;
@@ -428,7 +429,7 @@ C_3B1D()
 	D_C234 = D_C254[D_C236];
 }
 
-C_3B63()
+void C_3B63()
 {
 	D_D4E2 = 0;
 	D_00EE = 2;
@@ -439,7 +440,7 @@ C_3B63()
 	D_C234 = D_C254[D_C236];
 }
 
-C_3BAC()
+void C_3BAC()
 {
 	D_D43A = 1;
 	D_0110 = 0x1f;
@@ -449,7 +450,7 @@ C_3BAC()
 	D_00FA = 0;
 }
 
-C_3BEF()
+int C_3BEF()
 {
 	sound(1);
 	playerPosClamp -= 4;

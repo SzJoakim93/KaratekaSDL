@@ -6,6 +6,7 @@
 
 */
 #include "karateka.h"
+#include "assembly_replacements.h"
 
 /*---- ----*/
 unsigned char D_BF92[0x10000];
@@ -30,7 +31,7 @@ unsigned char D_CCCE[0x4000];
 /*---- ----*/
 
 /*load 'allpal' script*/
-C_19F5()
+void C_19F5()
 {
 	unsigned char dummy[4];
 
@@ -44,7 +45,7 @@ C_19F5()
 	load_sprite_assets(5);/*load ks/km files*/
 }
 
-C_1A35(bp10)
+void C_1A35(bp10)
 int bp10;
 {
 	int bp04;
@@ -74,7 +75,7 @@ int bp10;
 	D_C234 = D_C254[0];
 }
 
-load_level_assets(bp08)
+void load_level_assets(bp08)
 int bp08;
 {
 	int dummy;
@@ -95,7 +96,7 @@ int bp08;
 	WaitNoKey();
 }
 
-C_1B6E(bp0a)
+void C_1B6E(bp0a)
 int bp0a;
 {
 	int bp04;
@@ -148,7 +149,7 @@ int bp0a;
 		D_00F6 = 0;
 }
 
-C_1C9F(bp06)
+void C_1C9F(bp06)
 int bp06;
 {
 	D_00E8 = 1;
@@ -178,7 +179,7 @@ int bp06;
 		D_0158 ++;
 }
 
-C_1D4E()
+int C_1D4E()
 {
 	int bp02;
 	unsigned char bp04;
@@ -189,7 +190,7 @@ C_1D4E()
 		bp04 = C_1DD1();
 		bp02 = C_1E1C(bp04);
 		if(bp02 != -1) {
-			bp02 = C_1FD3(bp02, bp04);
+			bp02 = C_1FD3(bp02);
 			if(bp02 == -1) {
 				pressedKey = bp04;
 				isKeyPending = 1;
@@ -206,7 +207,7 @@ C_1D4E()
 	return -1;
 }
 
-C_1DD1()
+int C_1DD1()
 {
 	unsigned char bp02;
 
@@ -222,7 +223,7 @@ C_1DD1()
 	return bp02;
 }
 
-C_1E1C(bp0a)
+int C_1E1C(bp0a)
 int bp0a;
 {
 	int bp02;
@@ -280,7 +281,7 @@ int bp0a;
 }
 
 /*joystick calibration?*/
-C_1F43()
+void C_1F43()
 {
 	Beep();
 	if(C_46CC() == 0) {
@@ -294,7 +295,7 @@ C_1F43()
 }
 
 /*"CTRL+R menu"?*/
-C_1F86() {
+void C_1F86() {
 	int bp02;
 
 	Beep();
@@ -308,7 +309,7 @@ C_1F86() {
 	}
 }
 
-C_1FD3(bp06)
+int C_1FD3(bp06)
 unsigned char bp06;
 {
 	switch(D_010C) {
@@ -348,7 +349,7 @@ unsigned char bp06;
 	return -1;
 }
 
-C_20E3()
+int C_20E3()
 {
 	int bp02;
 

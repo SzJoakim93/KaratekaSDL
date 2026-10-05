@@ -10,7 +10,7 @@
 int D_DE66 = 1;
 
 /*random0*/
-C_414A()
+int C_414A()
 {
 	unsigned bp02;
 
@@ -22,14 +22,14 @@ C_414A()
 }
 
 /*set random seed*/
-__4186(bp04)
+void __4186(bp04)
 int bp04;
 {
 	getSetSeed(1, &bp04);/*set/get random seed*/
 }
 
 /*set/get random seed*/
-/*4198*/getSetSeed(bp06, bp08)
+/*4198*/void getSetSeed(bp06, bp08)
 char bp06;
 int *bp08;
 {

@@ -11,6 +11,8 @@ some alpha/beta versions can be found at:
 */
 
 #include "karateka.h"
+#include "assembly_replacements.h"
+#include "main.h"
 
 /*-- --*/
 int _stack = 300;
@@ -155,7 +157,7 @@ int D_41B9 = 0;
 /*42A2	"cal01"*/
 /*---- ----*/
 
-/*0255*/main(int argc, char* args[])
+/*0255*/int main(int argc, char* args[])
 {
 	int bp02;
 
@@ -257,7 +259,7 @@ int D_41B9 = 0;
 }
 
 /*intro and demo*/
-C_03DE()
+void C_03DE()
 {
 	int bp02;
 
@@ -383,7 +385,7 @@ C_03DE()
 }
 
 /*"input" for demo*/
-C_05D2()
+int C_05D2()
 {
 	if(
 		(D_00F8 == 1 && D_010C == 0x43) ||
@@ -395,7 +397,7 @@ C_05D2()
 }
 
 /*little intro*/
-C_0616()
+void C_0616()
 {
 	load_castle_bg();/*draw "castle.bcg"*/
 	load_background_graphics(/*41D6*/"fuji.bcg", 1500);
@@ -407,7 +409,7 @@ C_0616()
 	C_177B();/*execute script/animation?*/
 }
 
-C_064E()
+void C_064E()
 {
 	load_background_graphics(/*41D6*/"fuji.bcg", 1500);
 	load_level_assets(0);/*load level data*/

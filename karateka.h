@@ -120,3 +120,10 @@ extern unsigned char D_E0CE;
 /* Include central table/variable declarations */
 #include "tables.h"
 
+/* C module interfaces */
+#include "C_0FBB.h"
+#include "C_19F5.h"
+#include "C_268A.h"
+#include "C_3233.h"
+#include "C_414A.h"
+

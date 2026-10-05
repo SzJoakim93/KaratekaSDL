@@ -6,6 +6,7 @@
 
 */
 #include "karateka.h"
+#include "assembly_replacements.h"
 
 /*---- ----*/
 int D_D43A = 0;
@@ -45,7 +46,7 @@ int D_D4DC;
 int __D4DE;
 /*---- ----*/
 
-C_268A()
+int C_268A()
 {
 	int _p04;
 	int bp06;
@@ -167,7 +168,7 @@ C_268A()
 	return 0;
 }
 
-C_29C6(bp0a)
+int C_29C6(bp0a)
 int bp0a;
 {
 	int _p02;
@@ -191,16 +192,16 @@ int bp0a;
 	return 7;
 }
 
-C_2A6E()
+int C_2A6E()
 {
 	return k_rand(2) + 2;
 }
 
-__2A8F()
+void __2A8F()
 {
 }
 
-C_2A94()
+int C_2A94()
 {
 	if(D_00F2 == 1)
 		return k_rand(1) + 4;
@@ -208,7 +209,7 @@ C_2A94()
 		return k_rand(2) + 4;
 }
 
-C_2ACE()
+int C_2ACE()
 {
 	int _p02;
 	int bp04;
@@ -252,7 +253,7 @@ C_2ACE()
 	return C_2C19(bp04);
 }
 
-C_2C19(bp06)
+int C_2C19(bp06)
 int bp06;
 {
 	if(k_rand(0xff) > 0x32 && bp06 < 0x4b)
@@ -262,7 +263,7 @@ int bp06;
 	return 8;
 }
 
-C_2C62()
+int C_2C62()
 {
 	int bp04;
 	int bp06;
@@ -391,7 +392,7 @@ C_2C62()
 	}
 }
 
-C_2FB2()
+void C_2FB2()
 {
 	max_boundary += 0x14;
 	D_0142[D_0130] = 1;
@@ -405,7 +406,7 @@ C_2FB2()
 	D_D4E2 = -1;
 }
 
-C_301D()
+void C_301D()
 {
 	D_0154 = 3;
 	if(D_00EA == 3) {/*else 3088*/

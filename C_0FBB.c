@@ -6,9 +6,19 @@
 
 */
 #include <stdio.h>
+#ifdef _WIN32
+#include <io.h>
+#define open _open
+#define read _read
+#define close _close
+#else
+#include <unistd.h>
+extern int open(const char *fname, int attr, ...);
+#endif
 
 #include "fcntl.h"
 #include "karateka.h"
+#include "assembly_replacements.h"
 
 /*bb08	"castle.bcg"*/
 /*bb13	"r"*/
@@ -18,7 +28,7 @@
 /*bb2d	"%d %d"*/
 /*bb33	0*/
 
-/*0FBB*/load_background_graphics(fname, bp14)
+/*0FBB*/int load_background_graphics(fname, bp14)
 char *fname;
 int bp14;
 {
@@ -37,7 +47,7 @@ int bp14;
 
 
 /*draw "castle.bcg"*/
-load_castle_bg()
+void load_castle_bg()
 {
 	int h;
 	int bp06;
@@ -58,7 +68,7 @@ load_castle_bg()
 }
 
 /*load ks/km files*/
-load_sprite_assets(idx)
+void load_sprite_assets(idx)
 int idx;
 {
 	int h;
@@ -124,7 +134,7 @@ int idx;
 	/*-- --*/
 }
 
-/*12E0*/load_animation_script(path, bp6c)
+/*12E0*/int load_animation_script(path, bp6c)
 char *path;
 char *bp6c;
 {
@@ -150,7 +160,7 @@ char *bp6c;
 	return bp5e;
 }
 
-parse_script_line(bp16, bp18, bp1a, bp1c)
+void parse_script_line(bp16, bp18, bp1a, bp1c)
 char *bp16;
 char *bp18;
 int *bp1a;
@@ -286,7 +296,7 @@ int *bp1c;
 	}/*end switch*/
 }
 
-/*16D6*/open_file_safe(fname, attr)
+/*16D6*/int open_file_safe(fname, attr)
 char *fname;
 int attr;
 {
