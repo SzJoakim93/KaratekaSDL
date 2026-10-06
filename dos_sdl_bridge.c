@@ -23,6 +23,7 @@ static int speaker_end_frequency = 0;
 static int speaker_samples_remaining = 0;
 static int speaker_total_samples = 0;
 static double speaker_phase = 0.0;
+static SDL_Joystick *joystick = NULL;
 
 typedef struct {
 	unsigned short start_frequency;
@@ -139,9 +140,16 @@ static void toggle_fullscreen(void)
 void init_sdl_graphics(void)
 {
 #ifdef USE_SDL
-	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_TIMER) < 0) {
+	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_TIMER | SDL_INIT_JOYSTICK) < 0) {
 		fprintf(stderr, "SDL could not initialize: %s\n", SDL_GetError());
 		return;
+	}
+
+	SDL_JoystickEventState(SDL_ENABLE);
+	if (SDL_NumJoysticks() > 0) {
+		joystick = SDL_JoystickOpen(0);
+		if (!joystick)
+			fprintf(stderr, "SDL joystick could not be opened: %s\n", SDL_GetError());
 	}
 
 	{
@@ -179,6 +187,10 @@ void close_sdl_graphics(void)
 	if (audio_open) {
 		SDL_CloseAudio();
 		audio_open = 0;
+	}
+	if (joystick) {
+		SDL_JoystickClose(joystick);
+		joystick = NULL;
 	}
 	screen = NULL;
 	SDL_Quit();
@@ -356,6 +368,44 @@ static unsigned char map_sdl_keycode(int sdl_key)
 	}
 }
 
+static unsigned char map_sdl_joystick_button(int button)
+{
+	static const unsigned char button_keys[] = {
+		' ', 'a', 'z', 'x', 'w', 's', 'q', 'b', '0'
+	};
+
+	if (button < 0 || button >= (int)(sizeof(button_keys) / sizeof(button_keys[0])))
+		return 0;
+	return button_keys[button];
+}
+
+static unsigned char map_sdl_joystick_direction(void)
+{
+	int hat;
+	int axis;
+	Sint16 value;
+
+	if (!joystick)
+		return 0;
+
+	SDL_JoystickUpdate();
+	for (hat = 0; hat < SDL_JoystickNumHats(joystick); hat++) {
+		Uint8 position = SDL_JoystickGetHat(joystick, hat);
+		if (position & SDL_HAT_LEFT) return '4';
+		if (position & SDL_HAT_RIGHT) return '6';
+		if (position & SDL_HAT_UP) return '8';
+		if (position & SDL_HAT_DOWN) return '2';
+	}
+
+	for (axis = 0; axis < SDL_JoystickNumAxes(joystick) && axis < 2; axis++) {
+		value = SDL_JoystickGetAxis(joystick, axis);
+		if (value < -8000) return axis == 0 ? '4' : '8';
+		if (value > 8000) return axis == 0 ? '6' : '2';
+	}
+
+	return 0;
+}
+
 /* Poll events and convert SDL inputs into Karateka character inputs */
 int DoInput(int wait_for_key)
 {
@@ -380,11 +430,29 @@ int DoInput(int wait_for_key)
 				return 1;
 			}
 		}
+		else if (event.type == SDL_JOYBUTTONDOWN && joystick &&
+			event.jbutton.which == SDL_JoystickIndex(joystick)) {
+			unsigned char mappedKey = map_sdl_joystick_button(event.jbutton.button);
+			if (mappedKey > 0) {
+				pressedKey = mappedKey;
+				isKeyPending = 1;
+				return 1;
+			}
+		}
 		else if (event.type == SDL_VIDEORESIZE && !fullscreen_mode) {
 			if (set_video_mode(event.resize.w, event.resize.h, 0)) {
 				windowed_width = event.resize.w;
 				windowed_height = event.resize.h;
 			}
+		}
+	}
+
+	{
+		unsigned char mappedKey = map_sdl_joystick_direction();
+		if (mappedKey > 0) {
+			pressedKey = mappedKey;
+			isKeyPending = 1;
+			return 1;
 		}
 	}
 #endif
@@ -410,10 +478,14 @@ void WaitNoKey(void)
 	isKeyPending = 0;
 }
 
-/* Bypassed Joystick presence check */
+/* Report whether an SDL joystick is connected and open. */
 int C_46CC(void)
 {
-	return 0; /* Report no joystick connected to default to keyboard */
+#ifdef USE_SDL
+	return joystick != NULL;
+#else
+	return 0;
+#endif
 }
 
 /* Play the sound ID as a short PC-speaker-style square wave. */
