@@ -227,6 +227,8 @@ int D_41B9 = 0;
 					close_sdl_graphics();
 					return 0;
 				}
+				D_B9BA = -1;
+				render();
 				continue;
 			}
 			tim_wait();

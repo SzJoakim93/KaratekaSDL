@@ -229,20 +229,20 @@ void renderBG(int bg)
 		C_0E39();
 		if (D_00EA == 2) {
 			if (cameraClamp != D_B9BA) {
-				memset(&cga_buffer[80 * 80], 0x00, 30 * 80);
+				memset(&cga_buffer[60 * 80], 0x00, 50 * 80);
 				memcpy(&cga_buffer[80 * 80], &D_A606[1500], 22 * 80);
 				memset(&cga_buffer[90 * 80], 0x00, 1 * 80);
 			}
 			/* Draw dithered floor pattern */
 			for (int row = 154; row < 184; row++) {
-				memset(&cga_buffer[row * 80], row % 2 ? 0xAA : 0x00, 15 * 80);
+				memset(&cga_buffer[row * 80], row % 2 ? 0xAA : 0x00, 80);
 			}
 		} else {
 			if (cameraClamp != D_B9BA) {
 				memset(cga_buffer, 0x00, 114 * 80);
 			}
 			for (int row = 154; row < 184; row++) {
-				memset(&cga_buffer[row * 80], row % 2 ? 0x55 : 0x00, 15 * 80);
+				memset(&cga_buffer[row * 80], row % 2 ? 0x55 : 0x00, 80);
 			}
 		}
 	}
