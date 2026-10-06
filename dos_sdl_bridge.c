@@ -261,6 +261,18 @@ void BB_flip_wipe(void)
 static unsigned int timer_start_ticks = 0;
 static unsigned int previous_script_frame_ticks = 0;
 
+#ifdef USE_SDL
+static void delay_with_input(unsigned int duration_ms)
+{
+	unsigned int start_ticks = SDL_GetTicks();
+
+	while (SDL_GetTicks() - start_ticks < duration_ms) {
+		DoInput(0);
+		SDL_Delay(1);
+	}
+}
+#endif
+
 void tim_strt(void)
 {
 #ifdef USE_SDL
@@ -273,6 +285,7 @@ void tim_wait(void)
 #ifdef USE_SDL
 	/* Wait for at least 3 DOS ticks (165 ms) */
 	while (SDL_GetTicks() - timer_start_ticks < 165) {
+		DoInput(0);
 		SDL_Delay(1);
 	}
 	timer_start_ticks = SDL_GetTicks();
@@ -294,7 +307,7 @@ void script_frame_pace(unsigned int frame_duration_ms)
 
 	elapsed = now - previous_script_frame_ticks;
 	if (elapsed < frame_duration_ms) {
-		SDL_Delay(frame_duration_ms - elapsed);
+		delay_with_input(frame_duration_ms - elapsed);
 	}
 	previous_script_frame_ticks = SDL_GetTicks();
 #else
@@ -306,17 +319,16 @@ void C_1906(int ticks)
 {
 #ifdef USE_SDL
 	/* 1 DOS Tick = 55 ms */
-	unsigned int target = SDL_GetTicks() + (ticks * 55);
-	while (SDL_GetTicks() < target) {
-		SDL_Delay(1);
-	}
+	if (ticks > 0)
+		delay_with_input((unsigned int)ticks * 55);
 #endif
 }
 
 void delay_ms(int ms)
 {
 #ifdef USE_SDL
-	SDL_Delay(ms);
+	if (ms > 0)
+		delay_with_input((unsigned int)ms);
 #endif
 }
 
