@@ -18,5 +18,12 @@ Same for the variables/functions names; most of the time I name them with their 
 Anyway, we have the algorithms and the structures, and that  might be enough for thoses who want to have an insight of game programming back in the 80s.
 In Karateka's case, the most interesting part, in my opinion, is the script engine that manages the cutscene animation. By mastering it you might even be able to creta you own animations, why not ?
 
+## SDL joystick controls
+
+The SDL 1.2 port supports the first connected joystick or gamepad. Use the D-pad
+or left stick to move (left/right/up/down map to the arrow-key controls).
+Joystick buttons 0-8 map to Space, A, Z, X, W, S, Q, B, and 0, respectively.
+Button numbering follows SDL 1.2's joystick API and may vary by device.
+
 I whish you a lot of decompiling fun !  
 2024/05/30 ergonomy_joe
