@@ -8,7 +8,8 @@ OBJS = main.c \
 	C_414A.c \
 	C_3233.c \
 	tables.c \
-	stubs.c
+	stubs.c \
+	Sound/karateka_sound.c
 
 #CC specifies which compiler we're using
 CC = gcc

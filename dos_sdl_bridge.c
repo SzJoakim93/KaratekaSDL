@@ -3,9 +3,14 @@
 	Copyright 2026 SzJoakim93
 */
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include "karateka.h"
 #include "dos_sdl_bridge.h"
+
+#ifdef USE_SDL
+#include "Sound/karateka_sound.h"
+#endif
 
 /* External reference to the CGA linear backbuffer */
 extern char cga_buffer[16000];
@@ -18,74 +23,56 @@ static int windowed_height = 400;
 static int fullscreen_mode = 0;
 static int audio_open = 0;
 static int audio_sample_rate = 22050;
-static int speaker_start_frequency = 0;
-static int speaker_end_frequency = 0;
-static int speaker_samples_remaining = 0;
-static int speaker_total_samples = 0;
-static double speaker_phase = 0.0;
+static int16_t *sound_pcm[KS_SOUND_COUNT + 1];
+static size_t sound_pcm_lengths[KS_SOUND_COUNT + 1];
+static int playing_sound = 0;
+static size_t playback_position = 0;
 static SDL_Joystick *joystick = NULL;
 
-typedef struct {
-	unsigned short start_frequency;
-	unsigned short end_frequency;
-	unsigned short duration_ms;
-} SpeakerTone;
+static void free_sound_bank(void)
+{
+	int n;
 
-/* The original hit effects use changing speaker-toggle rates rather than fixed notes. */
-static const SpeakerTone speaker_tones[0x1a] = {
-	{ 0, 0, 0 },
-	{ 7800, 270, 52 }, { 7800, 435, 23 },
-	{ 3140, 3140, 3 }, { 1570, 1570, 10 },
-	{ 980, 7800, 2 }, { 980, 980, 3 },
-	{ 587, 587, 120 }, { 784, 784, 120 },
-	{ 698, 698, 100 }, { 392, 392, 130 },
-	{ 988, 988, 90 }, { 523, 523, 120 },
-	{ 622, 622, 100 }, { 831, 831, 120 },
-	{ 554, 554, 100 }, { 740, 740, 90 },
-	{ 659, 659, 120 }, { 494, 494, 100 },
-	{ 932, 932, 100 }, { 587, 587, 90 },
-	{ 784, 784, 100 }, { 466, 466, 120 },
-	{ 659, 659, 90 }, { 880, 880, 120 },
-	{ 349, 349, 150 }
-};
+	for (n = 1; n <= KS_SOUND_COUNT; n++) {
+		free(sound_pcm[n]);
+		sound_pcm[n] = NULL;
+		sound_pcm_lengths[n] = 0;
+	}
+}
+
+static int render_sound_bank(void)
+{
+	int n;
+
+	for (n = 1; n <= KS_SOUND_COUNT; n++) {
+		sound_pcm[n] = ks_render(n, audio_sample_rate, &sound_pcm_lengths[n]);
+		if (!sound_pcm[n]) {
+			fprintf(stderr, "Could not render sound %d (%s)\n", n, ks_sound_name(n));
+			free_sound_bank();
+			return 0;
+		}
+	}
+	return 1;
+}
 
 static void speaker_audio_callback(void *userdata, Uint8 *stream, int length)
 {
 	Sint16 *samples = (Sint16*)stream;
-	int sample_count = length / (int)sizeof(*samples);
-	int sample_index;
-	int ramp_samples = audio_sample_rate / 200;
-	double phase_step;
-	double frequency;
+	size_t sample_count = (size_t)length / sizeof(*samples);
+	size_t available;
+	size_t copy_count;
 
 	(void)userdata;
 	memset(stream, 0, length);
-	if (speaker_start_frequency <= 0 || speaker_end_frequency <= 0 || speaker_samples_remaining <= 0)
+	if (playing_sound <= 0)
 		return;
-	if (ramp_samples > speaker_total_samples / 4)
-		ramp_samples = speaker_total_samples / 4;
-	if (ramp_samples < 1)
-		ramp_samples = 1;
-
-	for (sample_index = 0; sample_index < sample_count && speaker_samples_remaining > 0; sample_index++) {
-		int elapsed = speaker_total_samples - speaker_samples_remaining;
-		int edge_samples = elapsed;
-		int amplitude = 5000;
-		double progress = (double)elapsed / speaker_total_samples;
-
-		if (speaker_samples_remaining < edge_samples)
-			edge_samples = speaker_samples_remaining;
-		if (edge_samples < ramp_samples && ramp_samples > 0)
-			amplitude = amplitude * edge_samples / ramp_samples;
-
-		frequency = speaker_start_frequency +
-			(speaker_end_frequency - speaker_start_frequency) * progress;
-		phase_step = 6.283185307179586 * frequency / audio_sample_rate;
-		samples[sample_index] = speaker_phase < 3.141592653589793 ? (Sint16)amplitude : (Sint16)-amplitude;
-		speaker_phase += phase_step;
-		if (speaker_phase >= 6.283185307179586)
-			speaker_phase -= 6.283185307179586;
-		speaker_samples_remaining--;
+	available = sound_pcm_lengths[playing_sound] - playback_position;
+	copy_count = sample_count < available ? sample_count : available;
+	memcpy(samples, sound_pcm[playing_sound] + playback_position, copy_count * sizeof(*samples));
+	playback_position += copy_count;
+	if (playback_position == sound_pcm_lengths[playing_sound]) {
+		playing_sound = 0;
+		playback_position = 0;
 	}
 }
 
@@ -154,15 +141,27 @@ void init_sdl_graphics(void)
 
 	{
 		SDL_AudioSpec desired_audio;
+		SDL_AudioSpec obtained_audio;
 		memset(&desired_audio, 0, sizeof(desired_audio));
 		desired_audio.freq = audio_sample_rate;
 		desired_audio.format = AUDIO_S16SYS;
 		desired_audio.channels = 1;
 		desired_audio.samples = 512;
 		desired_audio.callback = speaker_audio_callback;
-		if (SDL_OpenAudio(&desired_audio, NULL) == 0) {
-			audio_open = 1;
-			SDL_PauseAudio(0);
+		if (SDL_OpenAudio(&desired_audio, &obtained_audio) == 0) {
+			if (obtained_audio.freq <= 0 || obtained_audio.format != AUDIO_S16SYS ||
+				obtained_audio.channels != 1) {
+				fprintf(stderr, "SDL audio returned an unsupported format\n");
+				SDL_CloseAudio();
+			} else {
+				audio_sample_rate = obtained_audio.freq;
+				if (render_sound_bank()) {
+					audio_open = 1;
+					SDL_PauseAudio(0);
+				} else {
+					SDL_CloseAudio();
+				}
+			}
 		} else {
 			fprintf(stderr, "SDL audio could not be opened: %s\n", SDL_GetError());
 		}
@@ -188,6 +187,9 @@ void close_sdl_graphics(void)
 		SDL_CloseAudio();
 		audio_open = 0;
 	}
+	free_sound_bank();
+	playing_sound = 0;
+	playback_position = 0;
 	if (joystick) {
 		SDL_JoystickClose(joystick);
 		joystick = NULL;
@@ -488,19 +490,16 @@ int C_46CC(void)
 #endif
 }
 
-/* Play the sound ID as a short PC-speaker-style square wave. */
+/* Play the pre-rendered PCM for a Karateka sound ID. */
 void sound(int id)
 {
 #ifdef USE_SDL
-	if (!audio_open || id <= 0 || id >= (int)(sizeof(speaker_tones) / sizeof(speaker_tones[0])))
+	if (!audio_open || id < 1 || id > KS_SOUND_COUNT)
 		return;
 
 	SDL_LockAudio();
-	speaker_start_frequency = speaker_tones[id].start_frequency;
-	speaker_end_frequency = speaker_tones[id].end_frequency;
-	speaker_total_samples = audio_sample_rate * speaker_tones[id].duration_ms / 1000;
-	speaker_samples_remaining = speaker_total_samples;
-	speaker_phase = 0.0;
+	playing_sound = id;
+	playback_position = 0;
 	SDL_UnlockAudio();
 #else
 	(void)id;
