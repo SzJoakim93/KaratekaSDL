@@ -35,6 +35,9 @@ void WaitNoKey(void);
 int C_46CC(void); /* Joystick presence check: returns 0 (no joystick) */
 
 /* Audio Abstraction */
+#ifdef USE_SDL
+extern int use_native_pc_speaker; /* Set to 1 for the Windows system Beep API. */
+#endif
 void sound(int id);
 
 /* Stub/Bypass definitions for DOS/BIOS hardware setup */

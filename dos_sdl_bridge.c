@@ -10,6 +10,7 @@
 
 #ifdef USE_SDL
 #include "Sound/karateka_sound.h"
+#include "native_speaker.h"
 #endif
 
 /* External reference to the CGA linear backbuffer */
@@ -17,11 +18,15 @@ extern char cga_buffer[16000];
 
 #ifdef USE_SDL
 
+/* Set to 1 to use the Windows system Beep API instead of SDL audio output. */
+int use_native_pc_speaker = 0;
+
 static SDL_Surface* screen = NULL;
 static int windowed_width = 640;
 static int windowed_height = 400;
 static int fullscreen_mode = 0;
 static int audio_open = 0;
+static int native_speaker_opened = 0;
 static int audio_sample_rate = 22050;
 static int16_t *sound_pcm[KS_SOUND_COUNT + 1];
 static size_t sound_pcm_lengths[KS_SOUND_COUNT + 1];
@@ -142,28 +147,39 @@ void init_sdl_graphics(void)
 	{
 		SDL_AudioSpec desired_audio;
 		SDL_AudioSpec obtained_audio;
-		memset(&desired_audio, 0, sizeof(desired_audio));
-		desired_audio.freq = audio_sample_rate;
-		desired_audio.format = AUDIO_S16SYS;
-		desired_audio.channels = 1;
-		desired_audio.samples = 512;
-		desired_audio.callback = speaker_audio_callback;
-		if (SDL_OpenAudio(&desired_audio, &obtained_audio) == 0) {
-			if (obtained_audio.freq <= 0 || obtained_audio.format != AUDIO_S16SYS ||
-				obtained_audio.channels != 1) {
-				fprintf(stderr, "SDL audio returned an unsupported format\n");
-				SDL_CloseAudio();
-			} else {
-				audio_sample_rate = obtained_audio.freq;
-				if (render_sound_bank()) {
-					audio_open = 1;
-					SDL_PauseAudio(0);
-				} else {
-					SDL_CloseAudio();
-				}
+		int native_audio_open = 0;
+		if (use_native_pc_speaker) {
+			if (render_sound_bank()) {
+				native_audio_open = native_speaker_open();
+				native_speaker_opened = native_audio_open;
+				if (!native_audio_open)
+					free_sound_bank();
 			}
-		} else {
-			fprintf(stderr, "SDL audio could not be opened: %s\n", SDL_GetError());
+		}
+		if (!native_audio_open) {
+			memset(&desired_audio, 0, sizeof(desired_audio));
+			desired_audio.freq = audio_sample_rate;
+			desired_audio.format = AUDIO_S16SYS;
+			desired_audio.channels = 1;
+			desired_audio.samples = 512;
+			desired_audio.callback = speaker_audio_callback;
+			if (SDL_OpenAudio(&desired_audio, &obtained_audio) == 0) {
+				if (obtained_audio.freq <= 0 || obtained_audio.format != AUDIO_S16SYS ||
+					obtained_audio.channels != 1) {
+					fprintf(stderr, "SDL audio returned an unsupported format\n");
+					SDL_CloseAudio();
+				} else {
+					audio_sample_rate = obtained_audio.freq;
+					if (render_sound_bank()) {
+						audio_open = 1;
+						SDL_PauseAudio(0);
+					} else {
+						SDL_CloseAudio();
+					}
+				}
+			} else {
+				fprintf(stderr, "SDL audio could not be opened: %s\n", SDL_GetError());
+			}
 		}
 	}
 
@@ -186,6 +202,10 @@ void close_sdl_graphics(void)
 	if (audio_open) {
 		SDL_CloseAudio();
 		audio_open = 0;
+	}
+	if (native_speaker_opened) {
+		native_speaker_close();
+		native_speaker_opened = 0;
 	}
 	free_sound_bank();
 	playing_sound = 0;
@@ -494,7 +514,14 @@ int C_46CC(void)
 void sound(int id)
 {
 #ifdef USE_SDL
-	if (!audio_open || id < 1 || id > KS_SOUND_COUNT)
+	if (id < 1 || id > KS_SOUND_COUNT)
+		return;
+
+	if (use_native_pc_speaker && native_speaker_opened) {
+		native_speaker_play(sound_pcm[id], sound_pcm_lengths[id], audio_sample_rate);
+		return;
+	}
+	if (!audio_open)
 		return;
 
 	SDL_LockAudio();
