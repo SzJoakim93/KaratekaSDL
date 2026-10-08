@@ -1,6 +1,8 @@
 #include "settings.h"
 
+#include <errno.h>
 #include <stdio.h>
+#include <string.h>
 
 Settings settings = {
     .resWidth = 640,
@@ -26,14 +28,25 @@ void read_settings(void)
     }
 }
 
-void write_settings(void)
+int write_settings(void)
 {
     FILE *file = fopen("settings.ini", "w");
-    if (file) {
-        fprintf(file, "resWidth=%d\n", settings.resWidth);
-        fprintf(file, "resHeight=%d\n", settings.resHeight);
-        fprintf(file, "fullscreen=%d\n", settings.fullscreen);
-        fprintf(file, "use_native_pc_speaker=%d\n", settings.use_native_pc_speaker);
-        fclose(file);
+    if (!file) {
+        fprintf(stderr, "Could not open settings.ini for writing: %s\n", strerror(errno));
+        return 0;
     }
+
+    if (fprintf(file, "resWidth=%d\n", settings.resWidth) < 0 ||
+        fprintf(file, "resHeight=%d\n", settings.resHeight) < 0 ||
+        fprintf(file, "fullscreen=%d\n", settings.fullscreen) < 0 ||
+        fprintf(file, "use_native_pc_speaker=%d\n", settings.use_native_pc_speaker) < 0) {
+        fprintf(stderr, "Could not write settings.ini\n");
+        fclose(file);
+        return 0;
+    }
+    if (fclose(file) != 0) {
+        fprintf(stderr, "Could not finish writing settings.ini: %s\n", strerror(errno));
+        return 0;
+    }
+    return 1;
 }

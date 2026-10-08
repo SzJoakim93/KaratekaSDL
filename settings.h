@@ -12,6 +12,6 @@ extern Settings settings;
 extern int settings_changed;
 
 void read_settings(void);
-void write_settings(void);
+int write_settings(void);
 
 #endif // SETTINGS_H

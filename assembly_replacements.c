@@ -302,8 +302,34 @@ static void draw_cga_pixel(int x, int y, unsigned char color)
 	cga_buffer[byte_idx] |= (unsigned char)((color & 0x03u) << bit_shift);
 }
 
+static const unsigned char digit_glyphs[10][7] = {
+	{ 0x0E, 0x11, 0x13, 0x15, 0x19, 0x11, 0x0E },
+	{ 0x04, 0x0C, 0x04, 0x04, 0x04, 0x04, 0x0E },
+	{ 0x0E, 0x11, 0x01, 0x02, 0x04, 0x08, 0x1F },
+	{ 0x1E, 0x01, 0x01, 0x0E, 0x01, 0x01, 0x1E },
+	{ 0x02, 0x06, 0x0A, 0x12, 0x1F, 0x02, 0x02 },
+	{ 0x1F, 0x10, 0x10, 0x1E, 0x01, 0x01, 0x1E },
+	{ 0x0E, 0x10, 0x10, 0x1E, 0x11, 0x11, 0x0E },
+	{ 0x1F, 0x01, 0x02, 0x04, 0x08, 0x08, 0x08 },
+	{ 0x0E, 0x11, 0x11, 0x0E, 0x11, 0x11, 0x0E },
+	{ 0x0E, 0x11, 0x11, 0x0F, 0x01, 0x01, 0x0E }
+};
+
 static int draw_font_char(int x, int y, char ch, unsigned char color)
 {
+	if (ch >= '0' && ch <= '9') {
+		const unsigned char *glyph = digit_glyphs[ch - '0'];
+		int row, column;
+
+		for (row = 0; row < 7; row++) {
+			for (column = 0; column < 5; column++) {
+				if (glyph[row] & (0x10u >> column))
+					draw_cga_pixel(x + column, y + row, color);
+			}
+		}
+		return 6;
+	}
+
 	if (ch >= 'A' && ch <= 'Z') ch = (char)(ch - 'A' + 'a');
 	int idx = font_index(ch);
 	if (idx < 0)
@@ -325,7 +351,7 @@ static int draw_font_char(int x, int y, char ch, unsigned char color)
 	return font_advance_px[idx];
 }
 
-static void draw_text_block(int x, int y, const char *text, unsigned char color)
+void draw_text_block(int x, int y, const char *text, unsigned char color)
 {
 	int cursor_x = x;
 	for (const char *p = text; *p != '\0'; p++) {
@@ -339,13 +365,17 @@ static void draw_text_block(int x, int y, const char *text, unsigned char color)
 	}
 }
 
-static int text_width(const char *text)
+int text_width(const char *text)
 {
 	int width = 0;
 	for (const char *p = text; *p != '\0'; p++) {
 		char ch = *p;
 		if (ch >= 'A' && ch <= 'Z')
 			ch = (char)(ch - 'A' + 'a');
+		if (ch >= '0' && ch <= '9') {
+			width += 6;
+			continue;
+		}
 		int idx = font_index(ch);
 		width += idx < 0 ? 8 : font_advance_px[idx];
 	}
@@ -358,29 +388,6 @@ static void draw_intro_text_screen(const char *top_line, const char *bottom_line
 	draw_text_block((320 - text_width(top_line)) / 2, 78, top_line, 3);
 	draw_text_block((320 - text_width(bottom_line)) / 2, 96, bottom_line, 3);
 	BB_flip();
-}
-
-int quit_confirmation_scene(void)
-{
-	static const char *question = "Are you sure want to quit?";
-	static const char *choices = "Y / N";
-
-	for (;;) {
-		BB_clear();
-		draw_text_block((320 - text_width(question)) / 2, 86, question, 3);
-		draw_text_block((320 - text_width(choices)) / 2, 106, choices, 3);
-		BB_flip();
-
-		WaitKey();
-		switch (GetKey()) {
-			case 'y':
-			case 'Y':
-				return 1;
-			case 'n':
-			case 'N':
-				return 0;
-		}
-	}
 }
 
 /* Draws intro title screen */

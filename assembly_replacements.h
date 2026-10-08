@@ -18,7 +18,8 @@ int k_rand(int range);
 void render(void);
 void putFig(int fig, int x, int y);
 void putFig_flipx(int fig, int x, int y);
-int quit_confirmation_scene(void);
+void draw_text_block(int x, int y, const char *text, unsigned char color);
+int text_width(const char *text);
 int intro_karateka_title(void); /* Draws intro KARATEKA text */
 int intro_publisher(void); /* Draws Broderbund screen */
 int intro_story_scroll(void);

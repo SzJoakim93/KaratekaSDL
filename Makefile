@@ -2,6 +2,7 @@
 OBJS = main.c \
 	dos_sdl_bridge.c \
 	assembly_replacements.c \
+	menu_scene.c \
 	C_0FBB.c \
 	C_19F5.c \
 	C_268A.c \

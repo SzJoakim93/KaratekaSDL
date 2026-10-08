@@ -14,6 +14,7 @@ some alpha/beta versions can be found at:
 #include "assembly_replacements.h"
 #include "dos_sdl_bridge.h"
 #include "main.h"
+#include "menu_scene.h"
 
 /*-- --*/
 int _stack = 300;

@@ -14,6 +14,7 @@
 /* Graphics Setup */
 void init_sdl_graphics(void);
 void close_sdl_graphics(void);
+void apply_settings(void);
 
 /* Backbuffer Presentation */
 void BB_clear(void);

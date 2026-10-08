@@ -10,7 +10,7 @@ The game uses an SDL-based bridge to replace the original DOS routines. All asse
 
 * The game is 100% playable.
 * All known original gameplay features from the DOS version are working.
-* Pressing **Escape** opens a quit confirmation menu.
+* Pressing **Escape** opens a pause menu with Resume, Settings, and Quit.
 * The original PC speaker sounds are redirected to the sound card.
 * Keyboard and gamepad input are supported through SDL.
 
@@ -62,6 +62,8 @@ The game supports both keyboard and gamepad input.
 | Escape       | Start              | Open the pause menu                                              |
 
 > **Note:** Gamepad button names may vary depending on the device. See the SDL joystick mapping below for the exact button numbers.
+
+In the pause and settings menus, use **Up/Down** or the gamepad direction controls to navigate. Use **Space/Enter** or gamepad button A to select. In Settings, use **Left/Right** to change the selected value; Escape returns to the pause menu. Available resolutions cycle through common window sizes, and changed settings are saved to `settings.ini`.
 
 ## Building
 

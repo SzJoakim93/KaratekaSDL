@@ -45,6 +45,7 @@ static int render_sound_bank(void)
 {
 	int n;
 
+	free_sound_bank();
 	for (n = 1; n <= KS_SOUND_COUNT; n++) {
 		sound_pcm[n] = ks_render(n, audio_sample_rate, &sound_pcm_lengths[n]);
 		if (!sound_pcm[n]) {
@@ -53,6 +54,40 @@ static int render_sound_bank(void)
 			return 0;
 		}
 	}
+	return 1;
+}
+
+static void speaker_audio_callback(void *userdata, Uint8 *stream, int length);
+
+static int open_sdl_audio(void)
+{
+	SDL_AudioSpec desired_audio;
+	SDL_AudioSpec obtained_audio;
+
+	memset(&desired_audio, 0, sizeof(desired_audio));
+	desired_audio.freq = audio_sample_rate;
+	desired_audio.format = AUDIO_S16SYS;
+	desired_audio.channels = 1;
+	desired_audio.samples = 512;
+	desired_audio.callback = speaker_audio_callback;
+	if (SDL_OpenAudio(&desired_audio, &obtained_audio) != 0) {
+		fprintf(stderr, "SDL audio could not be opened: %s\n", SDL_GetError());
+		return 0;
+	}
+	if (obtained_audio.freq <= 0 || obtained_audio.format != AUDIO_S16SYS ||
+		obtained_audio.channels != 1) {
+		fprintf(stderr, "SDL audio returned an unsupported format\n");
+		SDL_CloseAudio();
+		return 0;
+	}
+
+	audio_sample_rate = obtained_audio.freq;
+	if (!render_sound_bank()) {
+		SDL_CloseAudio();
+		return 0;
+	}
+	audio_open = 1;
+	SDL_PauseAudio(0);
 	return 1;
 }
 
@@ -143,8 +178,6 @@ void init_sdl_graphics(void)
 	}
 
 	{
-		SDL_AudioSpec desired_audio;
-		SDL_AudioSpec obtained_audio;
 		int native_audio_open = 0;
 		if (settings.use_native_pc_speaker) {
 			if (render_sound_bank()) {
@@ -154,34 +187,12 @@ void init_sdl_graphics(void)
 					free_sound_bank();
 			}
 		}
-		if (!native_audio_open) {
-			memset(&desired_audio, 0, sizeof(desired_audio));
-			desired_audio.freq = audio_sample_rate;
-			desired_audio.format = AUDIO_S16SYS;
-			desired_audio.channels = 1;
-			desired_audio.samples = 512;
-			desired_audio.callback = speaker_audio_callback;
-			if (SDL_OpenAudio(&desired_audio, &obtained_audio) == 0) {
-				if (obtained_audio.freq <= 0 || obtained_audio.format != AUDIO_S16SYS ||
-					obtained_audio.channels != 1) {
-					fprintf(stderr, "SDL audio returned an unsupported format\n");
-					SDL_CloseAudio();
-				} else {
-					audio_sample_rate = obtained_audio.freq;
-					if (render_sound_bank()) {
-						audio_open = 1;
-						SDL_PauseAudio(0);
-					} else {
-						SDL_CloseAudio();
-					}
-				}
-			} else {
-				fprintf(stderr, "SDL audio could not be opened: %s\n", SDL_GetError());
-			}
-		}
+		if (!native_audio_open)
+			open_sdl_audio();
 	}
 
 	SDL_WM_SetCaption("Karateka SDL", 0);
+	SDL_ShowCursor(SDL_DISABLE);
 
 	if (!set_video_mode(settings.resWidth, settings.resHeight, settings.fullscreen)) {
 		fprintf(stderr, "Window could not be created: %s\n", SDL_GetError());
@@ -190,6 +201,43 @@ void init_sdl_graphics(void)
 
 	SDL_FillRect(screen, NULL, 0);
 	SDL_Flip(screen);
+#endif
+}
+
+/* Apply the values changed in the in-game settings menu. */
+void apply_settings(void)
+{
+#ifdef USE_SDL
+	if (!screen)
+		return;
+
+	if (!settings.fullscreen) {
+		windowed_width = settings.resWidth;
+		windowed_height = settings.resHeight;
+	}
+	if (screen->w != settings.resWidth || screen->h != settings.resHeight ||
+		fullscreen_mode != settings.fullscreen) {
+		set_video_mode(settings.resWidth, settings.resHeight, settings.fullscreen);
+	}
+
+	if (settings.use_native_pc_speaker) {
+		if (!native_speaker_opened) {
+			if (!sound_pcm[1] && !render_sound_bank())
+				return;
+			native_speaker_opened = native_speaker_open();
+			if (native_speaker_opened && audio_open) {
+				SDL_CloseAudio();
+				audio_open = 0;
+			}
+		}
+	} else {
+		if (native_speaker_opened) {
+			native_speaker_close();
+			native_speaker_opened = 0;
+		}
+		if (!audio_open)
+			open_sdl_audio();
+	}
 #endif
 }
 
@@ -369,6 +417,7 @@ static unsigned char map_sdl_keycode(int sdl_key)
 {
 	switch (sdl_key) {
 		case SDLK_SPACE:  return ' ';
+		case SDLK_RETURN: return '\r';
 		case SDLK_LEFT:   return '4';
 		case SDLK_RIGHT:  return '6';
 		case SDLK_UP:     return '8';
