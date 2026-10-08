@@ -10,7 +10,8 @@ OBJS = main.c \
 	tables.c \
 	stubs.c \
 	Sound/karateka_sound.c \
-	native_speaker.c
+	native_speaker.c \
+	settings.c
 
 #CC specifies which compiler we're using
 CC = gcc

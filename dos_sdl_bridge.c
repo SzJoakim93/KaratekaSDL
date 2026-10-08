@@ -17,10 +17,6 @@
 extern char cga_buffer[16000];
 
 #ifdef USE_SDL
-
-/* Set to 1 to use the Windows system Beep API instead of SDL audio output. */
-int use_native_pc_speaker = 0;
-
 static SDL_Surface* screen = NULL;
 static int windowed_width = 640;
 static int windowed_height = 400;
@@ -131,6 +127,8 @@ static void toggle_fullscreen(void)
 /* Initialize the SDL graphics subsystem and window*/
 void init_sdl_graphics(void)
 {
+	read_settings(); /* Load settings from settings.ini */
+
 #ifdef USE_SDL
 	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_TIMER | SDL_INIT_JOYSTICK) < 0) {
 		fprintf(stderr, "SDL could not initialize: %s\n", SDL_GetError());
@@ -148,7 +146,7 @@ void init_sdl_graphics(void)
 		SDL_AudioSpec desired_audio;
 		SDL_AudioSpec obtained_audio;
 		int native_audio_open = 0;
-		if (use_native_pc_speaker) {
+		if (settings.use_native_pc_speaker) {
 			if (render_sound_bank()) {
 				native_audio_open = native_speaker_open();
 				native_speaker_opened = native_audio_open;
@@ -185,7 +183,7 @@ void init_sdl_graphics(void)
 
 	SDL_WM_SetCaption("Karateka SDL", 0);
 
-	if (!set_video_mode(windowed_width, windowed_height, 0)) {
+	if (!set_video_mode(settings.resWidth, settings.resHeight, settings.fullscreen)) {
 		fprintf(stderr, "Window could not be created: %s\n", SDL_GetError());
 		return;
 	}
@@ -517,7 +515,7 @@ void sound(int id)
 	if (id < 1 || id > KS_SOUND_COUNT)
 		return;
 
-	if (use_native_pc_speaker && native_speaker_opened) {
+	if (settings.use_native_pc_speaker && native_speaker_opened) {
 		native_speaker_play(sound_pcm[id], sound_pcm_lengths[id], audio_sample_rate);
 		return;
 	}
