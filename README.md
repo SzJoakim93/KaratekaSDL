@@ -6,6 +6,8 @@ Karateka SDL is an SDL port based on the decompilation of the MS-DOS version of 
 
 The game uses an SDL-based bridge to replace the original DOS routines. All assembly code has been rewritten in C. The original assembly source files are preserved for reference only and are no longer required to compile the game.
 
+![Screenshot](Screenshots/Karateka1.png)
+
 ## Status
 
 * The game is 100% playable.
