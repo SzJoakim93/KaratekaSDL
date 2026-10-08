@@ -440,7 +440,7 @@ static unsigned char map_sdl_keycode(int sdl_key)
 static unsigned char map_sdl_joystick_button(int button)
 {
 	static const unsigned char button_keys[] = {
-		' ', 'a', 'z', 'x', 'w', 's', 'q', 'b', '0'
+		' ', 'a', 'z', 'x', 'w', 's', 'q', 0x1B, 'b', '0'
 	};
 
 	if (button < 0 || button >= (int)(sizeof(button_keys) / sizeof(button_keys[0])))

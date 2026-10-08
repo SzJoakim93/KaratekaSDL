@@ -235,14 +235,14 @@ void renderBG(int bg)
 			}
 			/* Draw dithered floor pattern */
 			for (int row = 154; row < 184; row++) {
-				memset(&cga_buffer[row * 80], row % 2 ? 0xAA : 0x00, 80);
+				memset(&cga_buffer[row * 80], row % 2 ? 0x00 : 0xAA, 80);
 			}
 		} else {
 			if (cameraClamp != D_B9BA) {
 				memset(cga_buffer, 0x00, 114 * 80);
 			}
 			for (int row = 154; row < 184; row++) {
-				memset(&cga_buffer[row * 80], row % 2 ? 0x55 : 0x00, 80);
+				memset(&cga_buffer[row * 80], row % 2 ? 0x00 : 0x55, 80);
 			}
 		}
 	}
@@ -263,7 +263,11 @@ void render(void)
 		int x = entries[idx].x_pos;
 		int y = entries[idx].y_pos;
 
-		if (x & 0x4000) {
+		if (x & 0x8000) {
+			x -= 0x10000;
+		}
+
+		if (x >= 0 && (x & 0x4000)) {
 			x &= ~0x4000;
 			putFig_flipx(fig, x, y);
 		} else {
