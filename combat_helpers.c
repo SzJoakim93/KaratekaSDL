@@ -9,12 +9,12 @@ int C_445D(int state, int offset_x, int index)
 	int val_state = state;
 	
 	if (val_state > 2) {
-		val_state += 3;
-	} else {
-		val_state -= 3;
+    	val_state -= 3;
 		if (val_state != 0) {
 			val_x -= 4;
 		}
+	} else {
+		val_state += 3;
 	}
 	
 	val_x &= 0xFFFC;
