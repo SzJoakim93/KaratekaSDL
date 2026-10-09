@@ -7,6 +7,7 @@
 */
 #include "karateka.h"
 #include "assembly_replacements.h"
+#include "cutscene.h"
 
 /*---- ----*/
 unsigned char D_BF92[0x10000];

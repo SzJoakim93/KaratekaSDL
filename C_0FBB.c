@@ -18,7 +18,7 @@ extern int open(const char *fname, int attr, ...);
 
 #include "fcntl.h"
 #include "karateka.h"
-#include "assembly_replacements.h"
+#include "cutscene.h"
 
 /*bb08	"castle.bcg"*/
 /*bb13	"r"*/

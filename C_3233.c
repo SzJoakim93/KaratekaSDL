@@ -7,6 +7,7 @@
 */
 #include "karateka.h"
 #include "assembly_replacements.h"
+#include "cutscene.h"
 
 /*---- ----*/
 int D_D502 = 0;

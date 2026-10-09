@@ -11,7 +11,11 @@ some alpha/beta versions can be found at:
 */
 
 #include "karateka.h"
-#include "assembly_replacements.h"
+#include "animation.h"
+#include "cutscene.h"
+#include "intro.h"
+#include "meters.h"
+#include "render_scene.h"
 #include "dos_sdl_bridge.h"
 #include "main.h"
 #include "menu_scene.h"

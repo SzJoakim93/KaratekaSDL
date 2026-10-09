@@ -7,6 +7,7 @@
 */
 #include "karateka.h"
 #include "assembly_replacements.h"
+#include "combat_helpers.h"
 
 /*---- ----*/
 int D_D43A = 0;

@@ -2,7 +2,7 @@
 
 #include <stdio.h>
 
-#include "assembly_replacements.h"
+#include "render_text.h"
 #include "dos_sdl_bridge.h"
 #include "settings.h"
 

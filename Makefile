@@ -2,6 +2,14 @@
 OBJS = main.c \
 	dos_sdl_bridge.c \
 	assembly_replacements.c \
+	render_sprites.c \
+	render_scene.c \
+	render_text.c \
+	intro.c \
+	cutscene.c \
+	animation.c \
+	meters.c \
+	combat_helpers.c \
 	menu_scene.c \
 	C_0FBB.c \
 	C_19F5.c \
